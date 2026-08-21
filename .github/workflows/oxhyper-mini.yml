@@ -1,0 +1,82 @@
+name: oxhyper-mini-public-benchmark
+
+on:
+  push:
+    branches:
+      - feat/real-data-benchmark
+    paths:
+      - ".github/workflows/oxhyper-mini.yml"
+      - "configs/experiments/oxhyper_mini_pca_logistic.yaml"
+      - "src/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: oxhyper-mini-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-data-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OMP_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+      DATASET_ROOT: data/external/OxHyperMinerals_MINI
+      PILOT_MANIFEST: data/pilots/oxhyper-mini.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install benchmark and geospatial dependencies
+        run: python -m pip install -e '.[benchmark,geo]'
+      - name: Download deterministic leakage-safe MINI slice
+        run: |
+          spectrashift download-oxhyper-mini \
+            --output "$DATASET_ROOT" \
+            --train-groups 1 \
+            --validation-groups 1 \
+            --test-groups 1 \
+            --tiles-per-group 4
+      - name: Create hash-verified pilot manifest
+        run: |
+          spectrashift index-oxhyper \
+            --dataset-root "$DATASET_ROOT" \
+            --output "$PILOT_MANIFEST" \
+            --train-groups 1 \
+            --validation-groups 1 \
+            --test-groups 1 \
+            --tiles-per-group 4 \
+            --hash-files
+      - name: Run spectral reference baseline
+        run: |
+          spectrashift benchmark-oxhyper \
+            --manifest "$PILOT_MANIFEST" \
+            --dataset-root "$DATASET_ROOT" \
+            --model prototype-sam \
+            --max-train-pixels-per-tile 12000 \
+            --output artifacts/oxhyper-mini-prototype-sam
+      - name: Run commercial probability baseline
+        run: |
+          spectrashift benchmark-oxhyper \
+            --manifest "$PILOT_MANIFEST" \
+            --dataset-root "$DATASET_ROOT" \
+            --model pca-logistic \
+            --max-train-pixels-per-tile 12000 \
+            --output artifacts/oxhyper-mini-pca-logistic
+      - name: Upload evidence bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oxhyper-mini-public-benchmark-${{ github.sha }}
+          path: |
+            data/pilots/oxhyper-mini.json
+            artifacts/oxhyper-mini-prototype-sam
+            artifacts/oxhyper-mini-pca-logistic
+          if-no-files-found: warn
+          retention-days: 14

@@ -33,6 +33,18 @@ from spectrashift.targeting import extract_target_cards
 CubeLoader = Callable[[str | Path, OxHyperRecord], HyperspectralCube]
 
 
+def _process_peak_rss_mb() -> float | None:
+    """Return process peak resident memory using the platform's ru_maxrss units."""
+
+    try:
+        import resource
+    except ImportError:  # pragma: no cover - unavailable on Windows
+        return None
+    peak = float(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+    divisor = 1024.0 * 1024.0 if sys.platform == "darwin" else 1024.0
+    return peak / divisor
+
+
 def sample_labeled_pixels(
     cube: HyperspectralCube,
     *,
@@ -240,6 +252,7 @@ def run_oxhyper_benchmark(
         "test_tile_latency_ms": test_latency,
         "mean_test_tile_latency_ms": float(np.mean(test_latency)),
         "sampled_training_pixels": int(spectra.shape[0]),
+        "process_peak_rss_mb": _process_peak_rss_mb(),
     }
     for class_name, row in zip(OXHYPER_CLASS_NAMES, report["per_class"], strict=True):
         row["class_name"] = class_name

@@ -22,6 +22,11 @@ DEFAULT_SPLIT_FILES = {
     "validation": "val_minerals.csv",
     "test": "test_minerals.csv",
 }
+MINI_SPLIT_FILES = {
+    "train": "train_minerals_10.csv",
+    "validation": "val_minerals_10.csv",
+    "test": "test_minerals_10.csv",
+}
 
 
 @dataclass(frozen=True)
@@ -99,6 +104,16 @@ def _read_split_map(root: Path, split_files: dict[str, str]) -> dict[str, str]:
     return split_map
 
 
+def _resolve_split_files(root: Path, split_files: dict[str, str] | None) -> dict[str, str]:
+    if split_files is not None:
+        return split_files
+    for candidate in (DEFAULT_SPLIT_FILES, MINI_SPLIT_FILES):
+        if all((root / filename).is_file() for filename in candidate.values()):
+            return candidate
+    expected = sorted({*DEFAULT_SPLIT_FILES.values(), *MINI_SPLIT_FILES.values()})
+    raise FileNotFoundError(f"no complete OxHyperMinerals split set found; tried {expected}")
+
+
 def _sha256_file(path: Path, *, chunk_bytes: int = 1024 * 1024) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -118,13 +133,10 @@ def discover_oxhyper_records(
     root = Path(dataset_root).expanduser().resolve()
     if not root.is_dir():
         raise FileNotFoundError(f"dataset root does not exist: {root}")
-    split_files = split_files or DEFAULT_SPLIT_FILES
+    split_files = _resolve_split_files(root, split_files)
     split_map = _read_split_map(root, split_files)
     if not split_map:
-        raise FileNotFoundError(
-            "no OxHyperMinerals split CSVs found; expected train_minerals.csv, "
-            "val_minerals.csv, and test_minerals.csv"
-        )
+        raise FileNotFoundError("OxHyperMinerals split CSVs contain no records")
 
     records: list[OxHyperRecord] = []
     incomplete: list[str] = []
@@ -247,6 +259,14 @@ def build_pilot_manifest(
         tiles_per_group=tiles_per_group,
         seed=seed,
     )
+    selected_groups_per_split = {
+        split: len({record.source_group for record in selected if record.split == split})
+        for split in ("train", "validation", "test")
+    }
+    selected_tiles_per_split = {
+        split: sum(record.split == split for record in selected)
+        for split in ("train", "validation", "test")
+    }
     manifest: dict[str, Any] = {
         "schema_version": 1,
         "created_at_utc": datetime.now(UTC).isoformat(),
@@ -265,6 +285,8 @@ def build_pilot_manifest(
             "tiles_per_group": tiles_per_group,
             "groups_per_split": groups_per_split
             or {"train": 4, "validation": 2, "test": 2},
+            "selected_groups_per_split": selected_groups_per_split,
+            "selected_tiles_per_split": selected_tiles_per_split,
             "excluded_leaking_groups": {
                 group: list(splits) for group, splits in sorted(excluded.items())
             },
@@ -409,20 +431,65 @@ def load_oxhyper_cube(
 
 
 def download_oxhyper_mini(
-    output: str | Path, *, revision: str = OXHYPER_MINI_REVISION
+    output: str | Path,
+    *,
+    revision: str = OXHYPER_MINI_REVISION,
+    groups_per_split: dict[str, int] | None = None,
+    tiles_per_group: int = 2,
+    seed: int = 20260822,
 ) -> Path:
-    """Download the authors' public development subset without embedding credentials."""
+    """Download a leakage-safe slice instead of the complete 9.32 GB MINI repository."""
 
     try:
-        from huggingface_hub import snapshot_download
+        from huggingface_hub import hf_hub_download, snapshot_download
     except ImportError as exc:  # pragma: no cover - optional network dependency
         raise RuntimeError("huggingface_hub is required; install spectrashift[geo]") from exc
     output = Path(output).expanduser().resolve()
     output.mkdir(parents=True, exist_ok=True)
+    for filename in MINI_SPLIT_FILES.values():
+        hf_hub_download(
+            repo_id=OXHYPER_MINI_REPOSITORY,
+            filename=filename,
+            repo_type="dataset",
+            revision=revision,
+            local_dir=output,
+        )
+    split_map = _read_split_map(output, MINI_SPLIT_FILES)
+    index_records = [
+        OxHyperRecord(
+            tile_id=tile_id,
+            split=split,
+            source_group=infer_source_group(tile_id),
+            cube_path=f"{tile_id}/C",
+            header_path=f"{tile_id}/C.hdr",
+            label_path=f"{tile_id}/minerals3ghk.tif",
+            info_path=f"{tile_id}/info.json",
+            cube_size_bytes=0,
+            label_size_bytes=0,
+        )
+        for tile_id, split in split_map.items()
+    ]
+    selected, _ = select_scene_safe_pilot(
+        index_records,
+        groups_per_split=groups_per_split,
+        tiles_per_group=tiles_per_group,
+        seed=seed,
+    )
+    allow_patterns = list(MINI_SPLIT_FILES.values())
+    for record in selected:
+        allow_patterns.extend(
+            [
+                record.cube_path,
+                record.header_path,
+                record.label_path,
+                f"{record.tile_id}/info.json",
+            ]
+        )
     snapshot_download(
         repo_id=OXHYPER_MINI_REPOSITORY,
         repo_type="dataset",
         revision=revision,
         local_dir=output,
+        allow_patterns=allow_patterns,
     )
     return output

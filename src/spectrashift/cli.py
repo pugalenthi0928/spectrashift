@@ -99,6 +99,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     download.add_argument("--output", type=Path, default=Path("data/external/OxHyperMinerals_MINI"))
     download.add_argument("--revision", default=OXHYPER_MINI_REVISION)
+    download.add_argument("--train-groups", type=int, default=4)
+    download.add_argument("--validation-groups", type=int, default=2)
+    download.add_argument("--test-groups", type=int, default=2)
+    download.add_argument("--tiles-per-group", type=int, default=2)
+    download.add_argument("--seed", type=int, default=20260822)
 
     index = subparsers.add_parser(
         "index-oxhyper", help="build a leakage-checked OxHyperMinerals pilot manifest"
@@ -132,7 +137,17 @@ def main() -> None:
     if args.command == "demo":
         print(json.dumps(run_demo(args.output, seed=args.seed), indent=2, sort_keys=True))
     elif args.command == "download-oxhyper-mini":
-        path = download_oxhyper_mini(args.output, revision=args.revision)
+        path = download_oxhyper_mini(
+            args.output,
+            revision=args.revision,
+            groups_per_split={
+                "train": args.train_groups,
+                "validation": args.validation_groups,
+                "test": args.test_groups,
+            },
+            tiles_per_group=args.tiles_per_group,
+            seed=args.seed,
+        )
         print(json.dumps({"dataset_root": str(path)}, indent=2, sort_keys=True))
     elif args.command == "index-oxhyper":
         manifest = build_pilot_manifest(

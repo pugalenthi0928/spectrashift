@@ -55,6 +55,27 @@ class OxHyperTests(unittest.TestCase):
             self.assertEqual({row["split"] for row in manifest["records"]}, {
                 "train", "validation", "test"
             })
+            self.assertEqual(
+                manifest["selection"]["selected_groups_per_split"],
+                {"train": 1, "validation": 1, "test": 1},
+            )
+            self.assertEqual(
+                manifest["selection"]["selected_tiles_per_split"],
+                {"train": 1, "validation": 1, "test": 1},
+            )
+
+    def test_auto_detects_mini_split_names(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._make_dataset(root)
+            renames = {
+                "train_minerals.csv": "train_minerals_10.csv",
+                "val_minerals.csv": "val_minerals_10.csv",
+                "test_minerals.csv": "test_minerals_10.csv",
+            }
+            for source, target in renames.items():
+                (root / source).rename(root / target)
+            self.assertEqual(len(discover_oxhyper_records(root)), 4)
 
     def test_source_group_removes_only_tile_suffix(self) -> None:
         self.assertEqual(infer_source_group("areaA_captureA_03"), "areaA_captureA")

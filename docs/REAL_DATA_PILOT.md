@@ -14,7 +14,9 @@ subset. Their official
 [HyperspectralViTs examples](https://github.com/previtus/HyperspectralViTs/blob/main/bash/demos_data_explore.sh)
 identify this subset as the small preview for OxHyperMinerals.
 
-The complete dataset is 372 GB and contains 796 training, 198 validation, and 200 test tiles. Each
+The MINI repository is 9.32 GB, so the download command first retrieves its split CSVs and then
+materializes only the deterministic leakage-safe pilot tiles. The complete dataset is 372 GB and
+contains 796 training, 198 validation, and 200 test tiles. Each
 tile is 512 by 512 pixels with 285 EMIT bands from approximately 381 to 2493 nm. The three primary
 labels are goethite, hematite, and kaolinite. Those labels are experimental products aggregated
 from EMIT L2B constituents; they are pseudo-ground truth, not field observations.
@@ -23,7 +25,8 @@ from EMIT L2B constituents; they are pseudo-ground truth, not field observations
 
 1. Download the MINI repository at the pinned `0b58274` revision.
 2. Discover only tiles containing `C`, `C.hdr`, and `minerals3ghk.tif`.
-3. Read the published `train_minerals.csv`, `val_minerals.csv`, and `test_minerals.csv` files.
+3. Read the MINI split files `train_minerals_10.csv`, `val_minerals_10.csv`, and
+   `test_minerals_10.csv` (the full release uses the corresponding names without `_10`).
 4. Infer the source capture from the tile identifier and remove any group crossing splits.
 5. Select whole source groups deterministically and preserve file sizes and optional SHA-256 hashes.
 6. Fit preprocessing and the model on training pixels only.
@@ -66,8 +69,12 @@ spectrashift benchmark-oxhyper \
 ```
 
 If the MINI subset does not contain enough source groups for the requested counts, the indexer uses
-the available leakage-safe groups and records the exact selection. If a split has no safe group, it
-fails rather than silently falling back to a random pixel split.
+the available leakage-safe groups and records both the requested and actual group/tile counts. If a
+split has no safe group, it fails rather than silently falling back to a random pixel split.
+
+The `oxhyper-mini-public-benchmark` GitHub Actions workflow runs a resource-bounded version of this
+protocol on every benchmark-branch update. It uploads the hash-verified pilot manifest and both
+baseline evidence bundles; it does not commit the downloaded dataset or generated predictions.
 
 ## Required review before reporting a score
 

@@ -89,6 +89,8 @@ class RealBenchmarkHarnessTests(unittest.TestCase):
                 loader=loader,
             )
             self.assertEqual(summary["evidence_grade"], "mechanism-tested")
+            metrics = json.loads((output / "metrics.json").read_text(encoding="utf-8"))
+            self.assertGreater(metrics["efficiency"]["process_peak_rss_mb"], 0.0)
             for name in (
                 "run_manifest.json",
                 "metrics.json",
