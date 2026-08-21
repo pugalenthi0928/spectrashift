@@ -31,6 +31,7 @@ jobs:
       MKL_NUM_THREADS: "2"
       DATASET_ROOT: data/external/OxHyperMinerals_MINI
       PILOT_MANIFEST: data/pilots/oxhyper-mini.json
+      SPECTRASHIFT_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

@@ -95,6 +95,11 @@ class RealBenchmarkHarnessTests(unittest.TestCase):
             self.assertEqual(metrics["data_profile"]["tiles"]["train"], 1)
             self.assertEqual(metrics["threshold_selection"]["split"], "validation")
             self.assertEqual(len(metrics["threshold_selection"]["selected"]), 3)
+            run_manifest = json.loads(
+                (output / "run_manifest.json").read_text(encoding="utf-8")
+            )
+            self.assertIn("pilot_manifest_sha256", run_manifest["data"])
+            self.assertIn("pilot_definition_sha256", run_manifest["data"])
             for name in (
                 "run_manifest.json",
                 "metrics.json",

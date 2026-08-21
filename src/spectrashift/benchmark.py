@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import os
 import platform
 import sys
 import time
 from dataclasses import asdict
 from datetime import UTC, datetime
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
@@ -43,6 +45,13 @@ def _process_peak_rss_mb() -> float | None:
     peak = float(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     divisor = 1024.0 * 1024.0 if sys.platform == "darwin" else 1024.0
     return peak / divisor
+
+
+def _installed_version(distribution: str) -> str | None:
+    try:
+        return version(distribution)
+    except PackageNotFoundError:
+        return None
 
 
 def sample_labeled_pixels(
@@ -332,7 +341,9 @@ def run_oxhyper_benchmark(
         all_failures.extend(_failure_cases(cube, probabilities, thresholds))
 
     stable_run = {
-        "pilot_manifest_sha256": sha256_value(pilot),
+        "pilot_definition_sha256": sha256_value(
+            {key: value for key, value in pilot.items() if key != "created_at_utc"}
+        ),
         "model_name": model_name,
         "seed": seed,
         "max_train_pixels_per_tile": max_train_pixels_per_tile,
@@ -345,7 +356,8 @@ def run_oxhyper_benchmark(
         evidence_grade=evidence_grade,
         data={
             "pilot_manifest": str(manifest_path),
-            "pilot_manifest_sha256": stable_run["pilot_manifest_sha256"],
+            "pilot_manifest_sha256": sha256_value(pilot),
+            "pilot_definition_sha256": stable_run["pilot_definition_sha256"],
             "dataset": pilot.get("dataset", {}),
             "records": [record.to_dict() for record in records],
         },
@@ -359,7 +371,10 @@ def run_oxhyper_benchmark(
         environment={
             "python": sys.version.split()[0],
             "numpy": np.__version__,
+            "rasterio": _installed_version("rasterio"),
+            "scikit_learn": _installed_version("scikit-learn"),
             "platform": platform.platform(),
+            "source_commit": os.environ.get("SPECTRASHIFT_SOURCE_COMMIT"),
         },
         limitations=tuple(pilot.get("limitations", [])),
     )
