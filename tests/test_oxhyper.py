@@ -11,6 +11,7 @@ from spectrashift.data.oxhyper import (
     build_pilot_manifest,
     discover_oxhyper_records,
     infer_source_group,
+    load_raw_oxhyper_labels,
     parse_envi_wavelengths,
     resolve_oxhyper_wavelengths,
 )
@@ -129,6 +130,17 @@ class OxHyperTests(unittest.TestCase):
             )
             np.testing.assert_allclose(wavelengths, [400.5, 500.5, 600.5])
             self.assertEqual(source, "raster-band-descriptions")
+
+    def test_loads_validated_headerless_mini_labels_as_little_endian_bsq(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "minerals3ghk.tif"
+            expected = np.zeros((3, 4, 5), dtype="<u2")
+            expected[0, 0, 0] = 1
+            expected[1, 1, 1] = 1
+            expected[2, 2, 2] = 1
+            path.write_bytes(expected.tobytes())
+            loaded = load_raw_oxhyper_labels(path, height=4, width=5)
+            np.testing.assert_array_equal(loaded, expected.astype(np.uint8))
 
 
 if __name__ == "__main__":

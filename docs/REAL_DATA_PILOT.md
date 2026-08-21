@@ -40,6 +40,11 @@ raster band descriptions, and only for a generic 285-band EMIT raster uses the e
 published in the authors' `HyperspectralViTs` loader. It fails on any other unresolved layout rather
 than synthesizing an evenly spaced wavelength grid.
 
+The MINI `minerals3ghk.tif` payloads are headerless raw arrays despite the filename extension. The
+fallback decoder activates only when raster loading fails and the file exactly matches a
+three-band, little-endian uint16, band-sequential array at the cube dimensions. It validates that
+all values are binary before assigning the published goethite/hematite/kaolinite band order.
+
 ## Baselines
 
 `prototype-sam` estimates one median positive spectrum per mineral from training data and applies

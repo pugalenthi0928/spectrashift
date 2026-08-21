@@ -428,6 +428,29 @@ def resolve_oxhyper_wavelengths(
     )
 
 
+def load_raw_oxhyper_labels(
+    label_path: str | Path,
+    *,
+    height: int,
+    width: int,
+) -> np.ndarray:
+    """Load the MINI release's headerless little-endian uint16 BSQ label payload."""
+
+    expected_values = len(OXHYPER_CLASS_NAMES) * height * width
+    expected_bytes = expected_values * np.dtype("<u2").itemsize
+    path = Path(label_path)
+    if path.stat().st_size != expected_bytes:
+        raise ValueError(
+            f"raw OxHyperMinerals label size mismatch for {path}: "
+            f"expected {expected_bytes}, found {path.stat().st_size}"
+        )
+    labels = np.fromfile(path, dtype="<u2", count=expected_values)
+    unique = np.unique(labels)
+    if not np.all(np.isin(unique, (0, 1))):
+        raise ValueError(f"raw OxHyperMinerals labels must be binary; found {unique.tolist()}")
+    return labels.reshape(len(OXHYPER_CLASS_NAMES), height, width).astype(np.uint8)
+
+
 def verify_record_integrity(
     dataset_root: str | Path,
     record: OxHyperRecord,
@@ -493,9 +516,19 @@ def load_oxhyper_cube(
         valid_mask &= np.all(reflectance != nodata, axis=-1)
     reflectance = np.nan_to_num(reflectance, nan=0.0, posinf=0.0, neginf=0.0)
 
-    with rasterio.open(label_path) as source:
-        labels_chw = source.read()
-        label_mask = np.all(source.read_masks() > 0, axis=0)
+    label_encoding = "rasterio"
+    try:
+        with rasterio.open(label_path) as source:
+            labels_chw = source.read()
+            label_mask = np.all(source.read_masks() > 0, axis=0)
+    except rasterio.errors.RasterioIOError:
+        labels_chw = load_raw_oxhyper_labels(
+            label_path,
+            height=reflectance.shape[0],
+            width=reflectance.shape[1],
+        )
+        label_mask = np.ones(reflectance.shape[:2], dtype=bool)
+        label_encoding = "raw-uint16-little-endian-bsq"
     if labels_chw.shape[0] != len(OXHYPER_CLASS_NAMES):
         raise ValueError(
             f"{record.tile_id} label raster must contain three bands in "
@@ -520,6 +553,7 @@ def load_oxhyper_cube(
             "transform": transform,
             "crs": crs,
             "wavelength_source": wavelength_source,
+            "label_encoding": label_encoding,
             "label_provenance": "EMIT L2B-derived experimental pseudo-labels",
         },
     )
