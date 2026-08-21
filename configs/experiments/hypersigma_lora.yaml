@@ -1,0 +1,33 @@
+experiment:
+  name: hypersigma_vitb_lora_oxhyperminerals
+  status: configured_not_executed
+  seed: 20260822
+
+data:
+  dataset: OxHyperMinerals
+  split_policy: published_scene_groups
+  wavelengths_nm: from_manifest
+  label_classes: [goethite, hematite, kaolinite]
+  label_provenance: algorithm_generated_pseudo_labels
+  label_budget_fraction: 0.10
+
+model:
+  family: HyperSIGMA
+  backbone: ViT-B
+  checkpoint: required_local_path
+  adaptation: lora
+  lora_rank: 8
+  lora_alpha: 16
+  wavelength_adapter: linear_interpolation_plus_learned_projection
+
+evaluation:
+  primary_metrics: [macro_f1, average_precision, mean_iou]
+  calibration_metrics: [ece, brier]
+  efficiency_metrics: [trainable_parameters, peak_memory_mb, latency_ms]
+  threshold_source: validation_only
+  preserve_failure_examples: true
+
+claims:
+  allow_public_result: false
+  required_grade: public-benchmark-observed
+

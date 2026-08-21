@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spectrashift"
+version = "0.1.0"
+description = "Evidence-first evaluation and target-ranking tools for hyperspectral mineral screening."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Pugalenthi Magendran" }]
+dependencies = ["numpy>=2.0"]
+
+[project.optional-dependencies]
+ml = ["torch>=2.4", "scikit-learn>=1.5", "pyyaml>=6.0"]
+geo = ["rasterio>=1.4", "xarray>=2024.7", "netCDF4>=1.7"]
+dev = ["pytest>=8.3", "ruff>=0.6"]
+
+[project.scripts]
+spectrashift = "spectrashift.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
