@@ -149,6 +149,21 @@ def _stack_valid(
     return np.concatenate(labels), np.concatenate(probabilities)
 
 
+def _label_profile(labels: np.ndarray) -> dict[str, Any]:
+    labels = np.asarray(labels, dtype=np.uint8)
+    if labels.ndim != 2 or labels.shape[1] != len(OXHYPER_CLASS_NAMES):
+        raise ValueError("label profile expects (pixels, three classes)")
+    supports = labels.sum(axis=0, dtype=np.int64)
+    total = int(labels.shape[0])
+    return {
+        "pixels": total,
+        "class_names": list(OXHYPER_CLASS_NAMES),
+        "positive_pixels": supports.astype(int).tolist(),
+        "negative_pixels": (total - supports).astype(int).tolist(),
+        "prevalence": (supports / max(total, 1)).astype(float).tolist(),
+    }
+
+
 def _failure_cases(
     cube: HyperspectralCube,
     probabilities: np.ndarray,
@@ -226,6 +241,7 @@ def run_oxhyper_benchmark(
         train_labels.append(labels)
     spectra = np.concatenate(train_spectra)
     labels = np.concatenate(train_labels)
+    training_profile = _label_profile(labels)
     model = _fit_model(model_name, spectra, labels, seed=seed)
     train_seconds = time.perf_counter() - train_start
 
@@ -233,19 +249,50 @@ def run_oxhyper_benchmark(
         _records(pilot, "validation"), dataset_root=dataset_root, loader=loader, model=model
     )
     validation_labels, validation_probabilities = _stack_valid(validation_outputs)
-    thresholds = optimize_f1_thresholds(validation_labels, validation_probabilities)
+    validation_profile = _label_profile(validation_labels)
+    threshold_candidates = np.linspace(0.05, 0.95, 19)
+    thresholds = optimize_f1_thresholds(
+        validation_labels,
+        validation_probabilities,
+        candidates=threshold_candidates,
+    )
     del validation_outputs, validation_labels, validation_probabilities
 
     test_outputs, test_latency = _load_predictions(
         _records(pilot, "test"), dataset_root=dataset_root, loader=loader, model=model
     )
     test_labels, test_probabilities = _stack_valid(test_outputs)
+    test_profile = _label_profile(test_labels)
     report = multilabel_report(test_labels, test_probabilities, threshold=thresholds)
     report["expected_calibration_error"] = expected_calibration_error(
         test_labels, test_probabilities
     )
     report["brier_score"] = brier_score(test_labels, test_probabilities)
     report["selective_risk_curve"] = selective_risk_curve(test_labels, test_probabilities)
+    report["data_profile"] = {
+        "training_sample": {
+            **training_profile,
+            "note": "Class-aware sampled pixels; prevalence is intentionally not natural.",
+        },
+        "validation": validation_profile,
+        "test": test_profile,
+        "tiles": {
+            split: len(_records(pilot, split))
+            for split in ("train", "validation", "test")
+        },
+    }
+    report["threshold_selection"] = {
+        "split": "validation",
+        "objective": "per-class F1",
+        "candidates": threshold_candidates.tolist(),
+        "selected": thresholds.tolist(),
+        "at_lower_search_bound": np.isclose(
+            thresholds, threshold_candidates[0]
+        ).tolist(),
+        "at_upper_search_bound": np.isclose(
+            thresholds, threshold_candidates[-1]
+        ).tolist(),
+    }
     report["efficiency"] = {
         "training_seconds": train_seconds,
         "validation_tile_latency_ms": validation_latency,
@@ -337,6 +384,14 @@ def run_oxhyper_benchmark(
         "mean_iou": report["mean_iou"],
         "targets": len(all_cards),
         "failure_cases": len(all_failures),
+        "threshold_boundary_classes": [
+            class_name
+            for class_name, threshold in zip(
+                OXHYPER_CLASS_NAMES, thresholds, strict=True
+            )
+            if np.isclose(threshold, threshold_candidates[0])
+            or np.isclose(threshold, threshold_candidates[-1])
+        ],
         "artifact_hashes": hashes,
         "warning": "Experimental pseudo-label benchmark; not field or deposit validation.",
     }

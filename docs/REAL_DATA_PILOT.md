@@ -91,6 +91,7 @@ baseline evidence bundles; it does not commit the downloaded dataset or generate
 - Verify the dataset revision, split records, file hashes, and class order.
 - Inspect per-class support and confirm that every training class contains positives and negatives.
 - Compare validation and test prevalence and flag a distribution shift.
+- Flag thresholds selected at the edge of the validation search range.
 - Review the highest-confidence false positives and false negatives with their spectra.
 - Report macro and per-class F1, AUPRC, IoU, ECE, Brier score, risk-coverage, latency, and memory.
 - Retain the pseudo-label and surface-versus-subsurface limitations beside every public result.
