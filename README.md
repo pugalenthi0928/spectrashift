@@ -27,8 +27,10 @@ This repository is being built in evidence-first stages.
   target extraction, target ranking, a deterministic synthetic demonstration, and a real-data
   OxHyperMinerals pilot runner with ENVI ingestion, source-group leakage detection, validation-only
   threshold selection, PCA-logistic and prototype-SAM baselines, prediction maps, and failure cases.
-- **Ready for an authorized public-data run, not yet claimed as executed:** the
-  OxHyperMinerals-MINI benchmark and HyperFree/HyperSIGMA evaluations.
+- **Public pilot observed:** prototype-SAM and PCA-logistic were run on a pinned, hash-verified,
+  source-group-safe OxHyperMinerals-MINI pilot. The reviewed result and limitations are preserved
+  in [`results/oxhyper-mini`](results/oxhyper-mini/README.md).
+- **Not yet claimed as executed:** HyperFree and HyperSIGMA comparisons.
 - **No benchmark result is reported until its run manifest and artifacts exist.**
 
 The synthetic demo is a software test fixture. It is not geological evidence and must not be used
@@ -84,8 +86,10 @@ spectrashift benchmark-oxhyper \
   --output artifacts/oxhyper-mini-pca-logistic
 ```
 
-See [the real-data pilot protocol](docs/REAL_DATA_PILOT.md). A score belongs in this README only
-after the command completes and its manifest, metrics, and limitations have been reviewed.
+See [the real-data pilot protocol](docs/REAL_DATA_PILOT.md) and
+[reviewed public-pilot result](results/oxhyper-mini/README.md). On one held-out MINI test tile,
+prototype-SAM reached 0.199 macro F1 and 0.212 macro AUPRC; PCA-logistic reached 0.055 and 0.242.
+These are pseudo-label pilot results, not field or deposit validation.
 
 ## Evidence boundaries
 

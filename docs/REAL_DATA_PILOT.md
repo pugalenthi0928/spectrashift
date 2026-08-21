@@ -99,3 +99,7 @@ insufficient support stops the run before threshold selection.
 - Retain the pseudo-label and surface-versus-subsurface limitations beside every public result.
 
 No result from this pilot should be called externally validated or field validated.
+
+The reviewed baseline result is preserved in
+[`results/oxhyper-mini`](../results/oxhyper-mini/README.md). It is the locked reference for the next
+frozen-foundation-model comparison.

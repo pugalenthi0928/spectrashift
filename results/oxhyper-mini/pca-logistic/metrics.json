@@ -1,0 +1,277 @@
+{
+  "brier_score": 0.48673290301979605,
+  "data_profile": {
+    "test": {
+      "class_names": [
+        "goethite",
+        "hematite",
+        "kaolinite"
+      ],
+      "negative_pixels": [
+        209319,
+        139527,
+        226001
+      ],
+      "pixels": 239006,
+      "positive_pixels": [
+        29687,
+        99479,
+        13005
+      ],
+      "prevalence": [
+        0.12421027087186096,
+        0.41621967649347713,
+        0.05441285992820264
+      ]
+    },
+    "tiles": {
+      "test": 1,
+      "train": 4,
+      "validation": 3
+    },
+    "training_sample": {
+      "class_names": [
+        "goethite",
+        "hematite",
+        "kaolinite"
+      ],
+      "negative_pixels": [
+        31936,
+        32424,
+        39331
+      ],
+      "note": "Class-aware sampled pixels; prevalence is intentionally not natural.",
+      "pixels": 48000,
+      "positive_pixels": [
+        16064,
+        15576,
+        8669
+      ],
+      "prevalence": [
+        0.33466666666666667,
+        0.3245,
+        0.18060416666666668
+      ]
+    },
+    "validation": {
+      "class_names": [
+        "goethite",
+        "hematite",
+        "kaolinite"
+      ],
+      "negative_pixels": [
+        640326,
+        624243,
+        630754
+      ],
+      "pixels": 654174,
+      "positive_pixels": [
+        13848,
+        29931,
+        23420
+      ],
+      "prevalence": [
+        0.021168679892505662,
+        0.04575388199469866,
+        0.03580087255072809
+      ]
+    }
+  },
+  "efficiency": {
+    "mean_test_tile_latency_ms": 182.2783270000059,
+    "process_peak_rss_mb": 2435.51171875,
+    "sampled_training_pixels": 48000,
+    "test_tile_latency_ms": [
+      182.2783270000059
+    ],
+    "training_seconds": 5.970905262999992,
+    "validation_tile_latency_ms": [
+      181.41614600000366,
+      184.28478100000234,
+      177.73121599999797
+    ]
+  },
+  "expected_calibration_error": 0.4867232909268611,
+  "macro_average_precision": 0.24173292854515302,
+  "macro_f1": 0.05485377411830531,
+  "mean_iou": 0.028603889957225948,
+  "per_class": [
+    {
+      "average_precision": 0.19761548374819676,
+      "class_index": 0,
+      "class_name": "goethite",
+      "f1": 0.0,
+      "iou": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "support": 29687
+    },
+    {
+      "average_precision": 0.49509823924839563,
+      "class_index": 1,
+      "class_name": "hematite",
+      "f1": 0.08340561820244212,
+      "iou": 0.04351761593092884,
+      "precision": 0.8057090239410681,
+      "recall": 0.04397913127393721,
+      "support": 99479
+    },
+    {
+      "average_precision": 0.03248506263886664,
+      "class_index": 2,
+      "class_name": "kaolinite",
+      "f1": 0.08115570415247383,
+      "iou": 0.04229405394074902,
+      "precision": 0.042916267857775886,
+      "recall": 0.7447135717031911,
+      "support": 13005
+    }
+  ],
+  "selective_risk_curve": [
+    {
+      "confidence_floor": 1.0,
+      "coverage": 1.3946651269563666e-06,
+      "risk": 1.0
+    },
+    {
+      "confidence_floor": 1.0,
+      "coverage": 0.05263187256107936,
+      "risk": 0.9936668609889237
+    },
+    {
+      "confidence_floor": 1.0,
+      "coverage": 0.10526374512215872,
+      "risk": 0.9968069320048757
+    },
+    {
+      "confidence_floor": 0.9999999724640638,
+      "coverage": 0.15789561768323807,
+      "risk": 0.9648276714893917
+    },
+    {
+      "confidence_floor": 0.9999996964899083,
+      "coverage": 0.21052609557919047,
+      "risk": 0.8613921073725911
+    },
+    {
+      "confidence_floor": 0.9999988721671116,
+      "coverage": 0.2631579681402698,
+      "risk": 0.7963103307558999
+    },
+    {
+      "confidence_floor": 0.9999971291417751,
+      "coverage": 0.3157898407013492,
+      "risk": 0.7366921789362576
+    },
+    {
+      "confidence_floor": 0.9999942017307148,
+      "coverage": 0.36842171326242856,
+      "risk": 0.6833115666344898
+    },
+    {
+      "confidence_floor": 0.9999897480010986,
+      "coverage": 0.42105219115838094,
+      "risk": 0.6382004756510391
+    },
+    {
+      "confidence_floor": 0.9999830157121323,
+      "coverage": 0.4736840637194603,
+      "risk": 0.6003533152749971
+    },
+    {
+      "confidence_floor": 0.9999727401645941,
+      "coverage": 0.5263159362805396,
+      "risk": 0.5696860972287733
+    },
+    {
+      "confidence_floor": 0.9999556423499598,
+      "coverage": 0.578947808841619,
+      "risk": 0.5464303953593694
+    },
+    {
+      "confidence_floor": 0.9999270960397553,
+      "coverage": 0.6315782867375714,
+      "risk": 0.5296089459493478
+    },
+    {
+      "confidence_floor": 0.9998779498855583,
+      "coverage": 0.6842101592986508,
+      "risk": 0.5162263474054762
+    },
+    {
+      "confidence_floor": 0.9997894460393582,
+      "coverage": 0.7368420318597302,
+      "risk": 0.5046401011490946
+    },
+    {
+      "confidence_floor": 0.9996133135282435,
+      "coverage": 0.7894739044208096,
+      "risk": 0.49545901810209747
+    },
+    {
+      "confidence_floor": 0.9991703033447266,
+      "coverage": 0.8421043823167619,
+      "risk": 0.4899685990818212
+    },
+    {
+      "confidence_floor": 0.9975913763046265,
+      "coverage": 0.8947362548778413,
+      "risk": 0.4879602582527722
+    },
+    {
+      "confidence_floor": 0.9880529930815101,
+      "coverage": 0.9473681274389206,
+      "risk": 0.4877281827817689
+    },
+    {
+      "confidence_floor": 0.5001180768013,
+      "coverage": 1.0,
+      "risk": 0.49226518720589996
+    }
+  ],
+  "threshold": [
+    0.7999999999999999,
+    0.05,
+    0.95
+  ],
+  "threshold_selection": {
+    "at_lower_search_bound": [
+      false,
+      true,
+      false
+    ],
+    "at_upper_search_bound": [
+      false,
+      false,
+      true
+    ],
+    "candidates": [
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.39999999999999997,
+      0.44999999999999996,
+      0.49999999999999994,
+      0.5499999999999999,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.7999999999999999,
+      0.85,
+      0.9,
+      0.95
+    ],
+    "objective": "per-class F1",
+    "selected": [
+      0.7999999999999999,
+      0.05,
+      0.95
+    ],
+    "split": "validation"
+  }
+}
