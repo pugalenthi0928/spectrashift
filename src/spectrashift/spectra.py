@@ -37,8 +37,11 @@ def spectral_angles(
 ) -> np.ndarray:
     """Return spectral angle in radians for every pixel/reference pair."""
 
-    reflectance = np.asarray(reflectance, dtype=np.float64)
-    references = np.asarray(reference_spectra, dtype=np.float64)
+    reflectance = np.asarray(reflectance)
+    references = np.asarray(reference_spectra)
+    dtype = np.result_type(reflectance.dtype, references.dtype, np.float32)
+    reflectance = reflectance.astype(dtype, copy=False)
+    references = references.astype(dtype, copy=False)
     if reflectance.ndim != 3:
         raise ValueError("reflectance must have shape (height, width, bands)")
     if references.ndim != 2 or references.shape[1] != reflectance.shape[2]:
@@ -64,4 +67,3 @@ def angles_to_similarity(angles: np.ndarray, *, scale: float = 24.0) -> np.ndarr
     if scale <= 0:
         raise ValueError("scale must be positive")
     return np.exp(-scale * np.clip(angles, 0.0, np.pi))
-

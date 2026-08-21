@@ -24,9 +24,11 @@ This repository is being built in evidence-first stages.
 
 - **Implemented and tested:** hyperspectral data contracts, wavelength adaptation, geographic
   split validation, Spectral Angle Mapper baseline, multilabel metrics, calibration, connected
-  target extraction, target ranking, and a deterministic synthetic end-to-end demonstration.
-- **Configured, not yet claimed as executed:** HyperSIGMA and HyperFree evaluation on public EMIT
-  and OxHyperMinerals data.
+  target extraction, target ranking, a deterministic synthetic demonstration, and a real-data
+  OxHyperMinerals pilot runner with ENVI ingestion, source-group leakage detection, validation-only
+  threshold selection, PCA-logistic and prototype-SAM baselines, prediction maps, and failure cases.
+- **Ready for an authorized public-data run, not yet claimed as executed:** the
+  OxHyperMinerals-MINI benchmark and HyperFree/HyperSIGMA evaluations.
 - **No benchmark result is reported until its run manifest and artifacts exist.**
 
 The synthetic demo is a software test fixture. It is not geological evidence and must not be used
@@ -63,6 +65,28 @@ and geospatial extras only when needed:
 python3 -m pip install -e '.[ml,geo,dev]'
 ```
 
+### Real-data pilot
+
+The authors of OxHyperMinerals publish a small development subset with the same 285-band EMIT
+format. The real-data path is explicit and does not redistribute their data:
+
+```bash
+python3 -m pip install -e '.[benchmark,geo]'
+spectrashift download-oxhyper-mini --output data/external/OxHyperMinerals_MINI
+spectrashift index-oxhyper \
+  --dataset-root data/external/OxHyperMinerals_MINI \
+  --output data/pilots/oxhyper-mini.json \
+  --hash-files
+spectrashift benchmark-oxhyper \
+  --manifest data/pilots/oxhyper-mini.json \
+  --dataset-root data/external/OxHyperMinerals_MINI \
+  --model pca-logistic \
+  --output artifacts/oxhyper-mini-pca-logistic
+```
+
+See [the real-data pilot protocol](docs/REAL_DATA_PILOT.md). A score belongs in this README only
+after the command completes and its manifest, metrics, and limitations have been reviewed.
+
 ## Evidence boundaries
 
 - Public EMIT mineral products and OxHyperMinerals labels are useful research evidence, but not a
@@ -81,6 +105,7 @@ See [the evidence contract](docs/EVIDENCE_CONTRACT.md),
 
 - [NASA EMIT data resources](https://github.com/nasa/EMIT-Data-Resources)
 - [OxHyperMinerals and HyperspectralViTs](https://github.com/previtus/HyperspectralViTs)
+- [OxHyperMinerals-MINI](https://huggingface.co/datasets/previtus/OxHyperMinerals_MINI)
 - [USGS Spectral Library Version 7](https://www.usgs.gov/data/usgs-spectral-library-version-7-data)
 - [HyperSIGMA](https://github.com/WHU-Sigma/HyperSIGMA)
 - [HyperFree](https://github.com/Jingtao-Li-CVer/HyperFree)
@@ -93,4 +118,3 @@ redistributed by this repository.
 SpectraShift is an independent portfolio and research project built from public sources. It is not
 affiliated with, commissioned by, or representative of Esper Industries or any other commercial
 hyperspectral provider.
-

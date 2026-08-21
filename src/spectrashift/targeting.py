@@ -8,6 +8,7 @@ import numpy as np
 @dataclass(frozen=True)
 class TargetCard:
     target_id: str
+    scene_id: str
     class_name: str
     rank: int
     score: float
@@ -66,9 +67,11 @@ def extract_target_cards(
     valid_mask: np.ndarray,
     uncertainty: np.ndarray | None = None,
     spectral_agreement: np.ndarray | None = None,
-    threshold: float = 0.5,
+    threshold: float | np.ndarray = 0.5,
     min_pixels: int = 8,
     evidence_grade: str = "mechanism-tested",
+    scene_id: str = "unknown-scene",
+    max_targets: int | None = None,
 ) -> list[TargetCard]:
     """Convert thresholded class maps into explicit, ranked connected targets."""
 
@@ -84,6 +87,16 @@ def extract_target_cards(
         raise ValueError("probabilities must lie in [0, 1]")
     if min_pixels < 1:
         raise ValueError("min_pixels must be positive")
+    if max_targets is not None and max_targets < 1:
+        raise ValueError("max_targets must be positive when provided")
+
+    thresholds = np.asarray(threshold, dtype=np.float64)
+    if thresholds.ndim == 0:
+        thresholds = np.repeat(thresholds, len(class_names))
+    if thresholds.shape != (len(class_names),):
+        raise ValueError("threshold must be scalar or contain one value per class")
+    if np.any((thresholds < 0) | (thresholds > 1)):
+        raise ValueError("thresholds must lie in [0, 1]")
 
     if uncertainty is None:
         uncertainty = 4.0 * probabilities * (1.0 - probabilities)
@@ -98,7 +111,7 @@ def extract_target_cards(
     raw_cards: list[dict[str, object]] = []
     scene_area = probabilities.shape[0] * probabilities.shape[1]
     for class_index, class_name in enumerate(class_names):
-        class_mask = (probabilities[..., class_index] >= threshold) & valid_mask
+        class_mask = (probabilities[..., class_index] >= thresholds[class_index]) & valid_mask
         for component in _components(class_mask):
             if len(component) < min_pixels:
                 continue
@@ -148,9 +161,12 @@ def extract_target_cards(
             )
 
     raw_cards.sort(key=lambda card: (-float(card["score"]), str(card["class_name"])))
+    if max_targets is not None:
+        raw_cards = raw_cards[:max_targets]
     return [
         TargetCard(
-            target_id=f"T{rank:03d}",
+            target_id=f"{scene_id}:T{rank:03d}",
+            scene_id=scene_id,
             rank=rank,
             evidence_grade=evidence_grade,
             limitation=(
@@ -161,4 +177,3 @@ def extract_target_cards(
         )
         for rank, card in enumerate(raw_cards, start=1)
     ]
-

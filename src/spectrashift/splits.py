@@ -36,7 +36,9 @@ def grouped_split(
     if len({record.sample_id for record in records}) != len(records):
         raise ValueError("sample identifiers must be unique")
 
-    groups = sorted({record.scene_group for record in records}, key=lambda x: _stable_order(x, seed))
+    groups = sorted(
+        {record.scene_group for record in records}, key=lambda x: _stable_order(x, seed)
+    )
     if len(groups) < 3:
         raise ValueError("at least three scene groups are required")
     train_cut = max(1, round(len(groups) * train_fraction))
@@ -69,5 +71,6 @@ def assert_group_disjoint(splits: dict[str, list[SceneRecord]]) -> None:
         for right in names[index + 1 :]:
             overlap = group_sets[left] & group_sets[right]
             if overlap:
-                raise ValueError(f"scene-group leakage between {left} and {right}: {sorted(overlap)}")
-
+                raise ValueError(
+                    f"scene-group leakage between {left} and {right}: {sorted(overlap)}"
+                )

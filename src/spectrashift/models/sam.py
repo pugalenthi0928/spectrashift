@@ -11,7 +11,9 @@ class SpectralAngleMapper:
     """Spectral Angle Mapper baseline against aligned reference spectra."""
 
     def __init__(self, reference_spectra: np.ndarray, *, scale: float = 24.0) -> None:
-        self.reference_spectra = np.asarray(reference_spectra, dtype=np.float64)
+        self.reference_spectra = np.asarray(reference_spectra)
+        if not np.issubdtype(self.reference_spectra.dtype, np.floating):
+            self.reference_spectra = self.reference_spectra.astype(np.float32)
         self.scale = scale
         self.descriptor = ModelDescriptor(
             family="SpectralAngleMapper",
@@ -26,4 +28,3 @@ class SpectralAngleMapper:
         scores = angles_to_similarity(angles, scale=self.scale)
         scores[~cube.valid_mask] = 0.0
         return scores
-
