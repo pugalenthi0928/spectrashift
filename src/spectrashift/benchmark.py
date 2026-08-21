@@ -173,6 +173,31 @@ def _label_profile(labels: np.ndarray) -> dict[str, Any]:
     }
 
 
+def _assert_validation_support(
+    profile: dict[str, Any],
+    *,
+    minimum_positive_pixels: int,
+) -> None:
+    if minimum_positive_pixels < 1:
+        raise ValueError("minimum validation support must be positive")
+    for class_name, positives, negatives in zip(
+        profile["class_names"],
+        profile["positive_pixels"],
+        profile["negative_pixels"],
+        strict=True,
+    ):
+        if positives < minimum_positive_pixels:
+            raise ValueError(
+                f"validation support for {class_name} is {positives}; "
+                f"requires at least {minimum_positive_pixels} positive pixels"
+            )
+        if negatives < minimum_positive_pixels:
+            raise ValueError(
+                f"validation support for {class_name} has only {negatives} negatives; "
+                f"requires at least {minimum_positive_pixels}"
+            )
+
+
 def _failure_cases(
     cube: HyperspectralCube,
     probabilities: np.ndarray,
@@ -221,6 +246,7 @@ def run_oxhyper_benchmark(
     *,
     model_name: str = "pca-logistic",
     max_train_pixels_per_tile: int = 20000,
+    min_validation_positive_pixels: int = 1,
     seed: int = 20260822,
     loader: CubeLoader = load_oxhyper_cube,
 ) -> dict[str, Any]:
@@ -259,6 +285,10 @@ def run_oxhyper_benchmark(
     )
     validation_labels, validation_probabilities = _stack_valid(validation_outputs)
     validation_profile = _label_profile(validation_labels)
+    _assert_validation_support(
+        validation_profile,
+        minimum_positive_pixels=min_validation_positive_pixels,
+    )
     threshold_candidates = np.linspace(0.05, 0.95, 19)
     thresholds = optimize_f1_thresholds(
         validation_labels,
@@ -347,6 +377,7 @@ def run_oxhyper_benchmark(
         "model_name": model_name,
         "seed": seed,
         "max_train_pixels_per_tile": max_train_pixels_per_tile,
+        "min_validation_positive_pixels": min_validation_positive_pixels,
     }
     descriptor = asdict(model.descriptor)
     model_config = model.configuration() if hasattr(model, "configuration") else {}
@@ -367,6 +398,7 @@ def run_oxhyper_benchmark(
             "thresholds": thresholds.tolist(),
             "seed": seed,
             "max_train_pixels_per_tile": max_train_pixels_per_tile,
+            "min_validation_positive_pixels": min_validation_positive_pixels,
         },
         environment={
             "python": sys.version.split()[0],

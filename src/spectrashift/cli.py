@@ -128,6 +128,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--model", choices=("prototype-sam", "pca-logistic"), default="pca-logistic"
     )
     benchmark.add_argument("--max-train-pixels-per-tile", type=int, default=20000)
+    benchmark.add_argument("--min-validation-positive-pixels", type=int, default=1)
     benchmark.add_argument("--seed", type=int, default=20260822)
     return parser
 
@@ -183,6 +184,7 @@ def main() -> None:
             args.output,
             model_name=args.model,
             max_train_pixels_per_tile=args.max_train_pixels_per_tile,
+            min_validation_positive_pixels=args.min_validation_positive_pixels,
             seed=args.seed,
         )
         print(json.dumps(summary, indent=2, sort_keys=True))

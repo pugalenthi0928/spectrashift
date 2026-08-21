@@ -45,7 +45,7 @@ jobs:
           spectrashift download-oxhyper-mini \
             --output "$DATASET_ROOT" \
             --train-groups 1 \
-            --validation-groups 1 \
+            --validation-groups 2 \
             --test-groups 1 \
             --tiles-per-group 4
       - name: Create hash-verified pilot manifest
@@ -54,7 +54,7 @@ jobs:
             --dataset-root "$DATASET_ROOT" \
             --output "$PILOT_MANIFEST" \
             --train-groups 1 \
-            --validation-groups 1 \
+            --validation-groups 2 \
             --test-groups 1 \
             --tiles-per-group 4 \
             --hash-files
@@ -65,6 +65,7 @@ jobs:
             --dataset-root "$DATASET_ROOT" \
             --model prototype-sam \
             --max-train-pixels-per-tile 12000 \
+            --min-validation-positive-pixels 100 \
             --output artifacts/oxhyper-mini-prototype-sam
       - name: Run commercial probability baseline
         run: |
@@ -73,6 +74,7 @@ jobs:
             --dataset-root "$DATASET_ROOT" \
             --model pca-logistic \
             --max-train-pixels-per-tile 12000 \
+            --min-validation-positive-pixels 100 \
             --output artifacts/oxhyper-mini-pca-logistic
       - name: Upload evidence bundle
         if: always()

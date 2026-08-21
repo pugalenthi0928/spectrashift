@@ -79,6 +79,28 @@ class OxHyperTests(unittest.TestCase):
                 (root / source).rename(root / target)
             self.assertEqual(len(discover_oxhyper_records(root)), 4)
 
+    def test_manifest_preserves_leakage_from_complete_published_split_index(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._make_dataset(root)
+            for filename, tile in (
+                ("train_minerals.csv", "published_leak_00"),
+                ("test_minerals.csv", "published_leak_01"),
+            ):
+                with (root / filename).open("a", newline="", encoding="utf-8") as handle:
+                    writer = csv.DictWriter(handle, fieldnames=["id", "event_id"])
+                    writer.writerow({"id": 99, "event_id": tile})
+            manifest = build_pilot_manifest(
+                root,
+                root / "pilot.json",
+                groups_per_split={"train": 1, "validation": 1, "test": 1},
+                tiles_per_group=1,
+            )
+            self.assertEqual(
+                manifest["selection"]["excluded_leaking_groups"]["published_leak"],
+                ["test", "train"],
+            )
+
     def test_source_group_removes_only_tile_suffix(self) -> None:
         self.assertEqual(infer_source_group("areaA_captureA_03"), "areaA_captureA")
 

@@ -156,6 +156,23 @@ def _read_split_map(root: Path, split_files: dict[str, str]) -> dict[str, str]:
     return split_map
 
 
+def _index_records_from_split_map(split_map: dict[str, str]) -> list[OxHyperRecord]:
+    return [
+        OxHyperRecord(
+            tile_id=tile_id,
+            split=split,
+            source_group=infer_source_group(tile_id),
+            cube_path=f"{tile_id}/C",
+            header_path=f"{tile_id}/C.hdr",
+            label_path=f"{tile_id}/minerals3ghk.tif",
+            info_path=f"{tile_id}/info.json",
+            cube_size_bytes=0,
+            label_size_bytes=0,
+        )
+        for tile_id, split in split_map.items()
+    ]
+
+
 def _resolve_split_files(root: Path, split_files: dict[str, str] | None) -> dict[str, str]:
     if split_files is not None:
         return split_files
@@ -304,8 +321,12 @@ def build_pilot_manifest(
     seed: int = 20260822,
     hash_files: bool = False,
 ) -> dict[str, Any]:
-    records = discover_oxhyper_records(dataset_root, hash_files=hash_files)
-    selected, excluded = select_scene_safe_pilot(
+    root = Path(dataset_root).expanduser().resolve()
+    split_files = _resolve_split_files(root, None)
+    published_records = _index_records_from_split_map(_read_split_map(root, split_files))
+    published_overlaps = group_split_overlaps(published_records)
+    records = discover_oxhyper_records(root, split_files=split_files, hash_files=hash_files)
+    selected, downloaded_overlaps = select_scene_safe_pilot(
         records,
         groups_per_split=groups_per_split,
         tiles_per_group=tiles_per_group,
@@ -319,6 +340,7 @@ def build_pilot_manifest(
         split: sum(record.split == split for record in selected)
         for split in ("train", "validation", "test")
     }
+    excluded = {**downloaded_overlaps, **published_overlaps}
     manifest: dict[str, Any] = {
         "schema_version": 1,
         "created_at_utc": datetime.now(UTC).isoformat(),
@@ -339,6 +361,10 @@ def build_pilot_manifest(
             or {"train": 4, "validation": 2, "test": 2},
             "selected_groups_per_split": selected_groups_per_split,
             "selected_tiles_per_split": selected_tiles_per_split,
+            "published_tiles_per_split": {
+                split: sum(record.split == split for record in published_records)
+                for split in ("train", "validation", "test")
+            },
             "excluded_leaking_groups": {
                 group: list(splits) for group, splits in sorted(excluded.items())
             },
@@ -584,20 +610,7 @@ def download_oxhyper_mini(
             local_dir=output,
         )
     split_map = _read_split_map(output, MINI_SPLIT_FILES)
-    index_records = [
-        OxHyperRecord(
-            tile_id=tile_id,
-            split=split,
-            source_group=infer_source_group(tile_id),
-            cube_path=f"{tile_id}/C",
-            header_path=f"{tile_id}/C.hdr",
-            label_path=f"{tile_id}/minerals3ghk.tif",
-            info_path=f"{tile_id}/info.json",
-            cube_size_bytes=0,
-            label_size_bytes=0,
-        )
-        for tile_id, split in split_map.items()
-    ]
+    index_records = _index_records_from_split_map(split_map)
     selected, _ = select_scene_safe_pilot(
         index_records,
         groups_per_split=groups_per_split,

@@ -85,6 +85,8 @@ split has no safe group, it fails rather than silently falling back to a random 
 The `oxhyper-mini-public-benchmark` GitHub Actions workflow runs a resource-bounded version of this
 protocol on every benchmark-branch update. It uploads the hash-verified pilot manifest and both
 baseline evidence bundles; it does not commit the downloaded dataset or generated predictions.
+The hosted pilot requires at least 100 positive and 100 negative validation pixels per mineral;
+insufficient support stops the run before threshold selection.
 
 ## Required review before reporting a score
 

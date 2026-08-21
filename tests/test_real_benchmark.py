@@ -5,12 +5,21 @@ from pathlib import Path
 
 import numpy as np
 
-from spectrashift.benchmark import run_oxhyper_benchmark
+from spectrashift.benchmark import _assert_validation_support, run_oxhyper_benchmark
 from spectrashift.contracts import HyperspectralCube
 from spectrashift.data.oxhyper import OXHYPER_CLASS_NAMES, OxHyperRecord
 
 
 class RealBenchmarkHarnessTests(unittest.TestCase):
+    def test_rejects_validation_split_without_minimum_class_support(self) -> None:
+        profile = {
+            "class_names": list(OXHYPER_CLASS_NAMES),
+            "positive_pixels": [100, 99, 100],
+            "negative_pixels": [100, 100, 100],
+        }
+        with self.assertRaisesRegex(ValueError, "hematite"):
+            _assert_validation_support(profile, minimum_positive_pixels=100)
+
     def _record(self, tile_id: str, split: str) -> OxHyperRecord:
         return OxHyperRecord(
             tile_id=tile_id,
