@@ -23,7 +23,9 @@ class HyperspectralCube:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.reflectance = np.asarray(self.reflectance, dtype=np.float64)
+        self.reflectance = np.asarray(self.reflectance)
+        if not np.issubdtype(self.reflectance.dtype, np.floating):
+            self.reflectance = self.reflectance.astype(np.float32)
         self.wavelengths_nm = np.asarray(self.wavelengths_nm, dtype=np.float64)
         self.valid_mask = np.asarray(self.valid_mask, dtype=bool)
         if self.labels is not None:
@@ -75,4 +77,3 @@ class HyperspectralCube:
         """Return a ``(valid_pixels, bands)`` view of valid spectra."""
 
         return self.reflectance[self.valid_mask]
-

@@ -10,6 +10,7 @@ venv/
 
 # Never commit source hyperspectral cubes, credentials, or model weights.
 data/raw/
+data/external/
 data/interim/
 data/processed/
 checkpoints/
@@ -26,4 +27,3 @@ checkpoints/
 # Generated experiment outputs. Keep only intentionally curated examples.
 artifacts/*
 !artifacts/README.md
-
