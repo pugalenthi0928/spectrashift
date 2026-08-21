@@ -35,6 +35,11 @@ from EMIT L2B constituents; they are pseudo-ground truth, not field observations
 9. Preserve prediction maps, metrics, calibration, target cards, failure spectra, environment, and
    limitations in one result bundle.
 
+Some MINI ENVI headers omit wavelength fields. The loader first checks the header, then numeric
+raster band descriptions, and only for a generic 285-band EMIT raster uses the exact band centres
+published in the authors' `HyperspectralViTs` loader. It fails on any other unresolved layout rather
+than synthesizing an evenly spaced wavelength grid.
+
 ## Baselines
 
 `prototype-sam` estimates one median positive spectrum per mineral from training data and applies

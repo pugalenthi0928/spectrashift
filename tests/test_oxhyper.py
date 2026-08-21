@@ -12,6 +12,7 @@ from spectrashift.data.oxhyper import (
     discover_oxhyper_records,
     infer_source_group,
     parse_envi_wavelengths,
+    resolve_oxhyper_wavelengths,
 )
 
 
@@ -104,6 +105,30 @@ class OxHyperTests(unittest.TestCase):
                 encoding="utf-8",
             )
             np.testing.assert_allclose(parse_envi_wavelengths(path), [400, 500, 600])
+
+    def test_uses_published_emit_fallback_for_generic_285_band_descriptions(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "C.hdr"
+            path.write_text("ENVI\nbands = 285\n", encoding="utf-8")
+            wavelengths, source = resolve_oxhyper_wavelengths(
+                path, [f"Band {index}" for index in range(1, 286)]
+            )
+            self.assertEqual(wavelengths.size, 285)
+            self.assertAlmostEqual(wavelengths[0], 381.00558)
+            self.assertAlmostEqual(wavelengths[-1], 2492.9238)
+            self.assertEqual(source, "HyperspectralViTs-published-285-band-fallback")
+
+    def test_prefers_numeric_raster_band_descriptions_when_header_has_no_wavelengths(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "C.hdr"
+            path.write_text("ENVI\nbands = 3\n", encoding="utf-8")
+            wavelengths, source = resolve_oxhyper_wavelengths(
+                path, ["400.5 (400.5)", "500.5 (500.5)", "600.5 (600.5)"]
+            )
+            np.testing.assert_allclose(wavelengths, [400.5, 500.5, 600.5])
+            self.assertEqual(source, "raster-band-descriptions")
 
 
 if __name__ == "__main__":
