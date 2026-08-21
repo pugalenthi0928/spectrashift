@@ -1,0 +1,29 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+.DS_Store
+
+# Never commit source hyperspectral cubes, credentials, or model weights.
+data/raw/
+data/interim/
+data/processed/
+checkpoints/
+*.ckpt
+*.pth
+*.pt
+*.onnx
+*.nc
+*.h5
+*.hdf5
+*.tif
+*.tiff
+
+# Generated experiment outputs. Keep only intentionally curated examples.
+artifacts/*
+!artifacts/README.md
+

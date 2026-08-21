@@ -1,1 +1,96 @@
-# spectrashift
+# SpectraShift
+
+**Sensor-adaptive foundation-model evaluation for evidence-backed hyperspectral mineral screening.**
+
+SpectraShift is an independent, public-data research prototype that asks a commercially useful
+question: how reliably and efficiently can a pretrained hyperspectral model be adapted to a new
+sensor configuration, geography, and label budget, and how should its output be converted into
+inspectable analyst targets?
+
+The intended path is:
+
+`hyperspectral cube -> quality control -> model adaptation -> calibrated mineral maps -> ranked target cards`
+
+## Why this exists
+
+Hyperspectral mineral systems operate under difficult conditions: hundreds of bands, limited
+verified labels, sensor-to-sensor wavelength differences, mixed pixels, spatial leakage risk, and
+high costs when false confidence reaches an analyst. SpectraShift treats evaluation and evidence as
+part of the model, not as an afterthought.
+
+## Current status
+
+This repository is being built in evidence-first stages.
+
+- **Implemented and tested:** hyperspectral data contracts, wavelength adaptation, geographic
+  split validation, Spectral Angle Mapper baseline, multilabel metrics, calibration, connected
+  target extraction, target ranking, and a deterministic synthetic end-to-end demonstration.
+- **Configured, not yet claimed as executed:** HyperSIGMA and HyperFree evaluation on public EMIT
+  and OxHyperMinerals data.
+- **No benchmark result is reported until its run manifest and artifacts exist.**
+
+The synthetic demo is a software test fixture. It is not geological evidence and must not be used
+for mineral exploration decisions.
+
+## Planned research comparison
+
+| Family | Role |
+| --- | --- |
+| Spectral Angle Mapper | Physics-informed spectral baseline |
+| PCA + SVM / Random Forest | Classical commercial baselines |
+| HyperSegFormer | Task-specific hyperspectral transformer |
+| HyperSIGMA ViT-B | Pretrained spectral-spatial foundation model |
+| HyperFree | Channel-adaptive, promptable foundation model |
+
+The primary experiments compare frozen features, parameter-efficient adaptation, and full
+fine-tuning where compute allows. Splits are held out by source capture or geography, never by
+random neighboring pixels.
+
+## Quick start
+
+The tested core requires only Python 3.11+ and NumPy.
+
+```bash
+python3 -m pip install -e .
+spectrashift demo --output artifacts/demo
+python3 -m unittest discover -s tests -v
+```
+
+The demo writes a run manifest, metrics, probability maps, and ranked target cards. Install model
+and geospatial extras only when needed:
+
+```bash
+python3 -m pip install -e '.[ml,geo,dev]'
+```
+
+## Evidence boundaries
+
+- Public EMIT mineral products and OxHyperMinerals labels are useful research evidence, but not a
+  substitute for field verification or drill results.
+- OxHyperMinerals uses algorithm-generated pseudo-labels. Agreement with those labels is not the
+  same as verified geological truth.
+- Detected surface alteration indicators do not prove a subsurface economic deposit.
+- The language layer may retrieve and explain evidence; it must never manufacture or override the
+  spectral model's result.
+
+See [the evidence contract](docs/EVIDENCE_CONTRACT.md),
+[experiment protocol](docs/EXPERIMENT_PROTOCOL.md), and
+[architecture](docs/ARCHITECTURE.md).
+
+## Data and model sources
+
+- [NASA EMIT data resources](https://github.com/nasa/EMIT-Data-Resources)
+- [OxHyperMinerals and HyperspectralViTs](https://github.com/previtus/HyperspectralViTs)
+- [USGS Spectral Library Version 7](https://www.usgs.gov/data/usgs-spectral-library-version-7-data)
+- [HyperSIGMA](https://github.com/WHU-Sigma/HyperSIGMA)
+- [HyperFree](https://github.com/Jingtao-Li-CVer/HyperFree)
+
+Third-party datasets, labels, code, and checkpoints retain their original terms. They are not
+redistributed by this repository.
+
+## Independence statement
+
+SpectraShift is an independent portfolio and research project built from public sources. It is not
+affiliated with, commissioned by, or representative of Esper Industries or any other commercial
+hyperspectral provider.
+

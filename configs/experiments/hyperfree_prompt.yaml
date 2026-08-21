@@ -1,0 +1,29 @@
+experiment:
+  name: hyperfree_prompt_oxhyperminerals
+  status: configured_not_executed
+  seed: 20260822
+
+data:
+  dataset: OxHyperMinerals
+  split_policy: published_scene_groups
+  wavelengths_nm: from_manifest
+  label_classes: [goethite, hematite, kaolinite]
+  label_provenance: algorithm_generated_pseudo_labels
+
+model:
+  family: HyperFree
+  checkpoint: required_local_path
+  adaptation: promptable_then_optional_tuning
+  channel_policy: dynamic_wavelength_embedding
+
+evaluation:
+  primary_metrics: [macro_f1, average_precision, mean_iou]
+  calibration_metrics: [ece, brier]
+  efficiency_metrics: [latency_ms, peak_memory_mb]
+  threshold_source: validation_only
+  preserve_failure_examples: true
+
+claims:
+  allow_public_result: false
+  required_grade: public-benchmark-observed
+
