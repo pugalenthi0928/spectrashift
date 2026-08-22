@@ -1,0 +1,39 @@
+experiment:
+  name: oxhyper_mini_dofa_frozen
+  status: configured_not_executed
+  seed: 20260822
+
+data:
+  repository: previtus/OxHyperMinerals_MINI
+  revision: 0b58274
+  pilot_definition_sha256: 21691337ef2290d197993a3dd907b7d6317c71cb7ddffe3a88c70b6aba7ff4f4
+  source_group_policy: published_split_then_disjoint_source_capture
+  label_classes: [goethite, hematite, kaolinite]
+  label_provenance: emit_l2b_derived_experimental_pseudo_labels
+
+model:
+  family: DOFA-ViT-B
+  source_repository: zhu-xlab/DOFA
+  source_revision: 0cfb7e1099f4d4c4022946ff7862c7cd7b8411b9
+  checkpoint_repository: earthflow/DOFA
+  checkpoint_revision: 7a5219e48d2f8848511b0fabea7920a8836bc480
+  checkpoint_sha256: 4720985e42b918ac0307009eb06121a3435d9bbce6fd95446f84824a538165b1
+  adaptation: frozen_wavelength_aware_features_plus_linear_probe
+  input_bands: 285
+  input_size: 112
+  feature_layer: 11
+  positive_patch_fraction: 0.05
+  minimum_valid_patch_fraction: 0.8
+
+evaluation:
+  threshold_source: validation_only
+  min_validation_positive_pixels: 100
+  metrics: [macro_f1, average_precision, mean_iou, ece, brier, risk_coverage]
+  preserve_prediction_maps: true
+  preserve_failure_spectra: true
+  compare_against: [prototype-sam, pca-logistic]
+
+claims:
+  allow_public_result: false
+  required_grade: public-benchmark-observed
+  warning: frozen token maps are coarser than pixel-level spectral baselines

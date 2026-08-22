@@ -1,0 +1,114 @@
+name: dofa-oxhyper-mini-foundation-benchmark
+
+on:
+  pull_request:
+    branches:
+      - main
+      - feat/real-data-benchmark
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - ".github/workflows/dofa-oxhyper-mini.yml"
+      - "configs/experiments/oxhyper_mini_dofa_frozen.yaml"
+      - "src/spectrashift/benchmark.py"
+      - "src/spectrashift/models/dofa.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dofa-oxhyper-mini-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frozen-foundation-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OMP_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+      DATASET_ROOT: data/external/OxHyperMinerals_MINI
+      PILOT_MANIFEST: data/pilots/oxhyper-mini.json
+      DOFA_SOURCE: third_party/DOFA
+      DOFA_CHECKPOINT: checkpoints/DOFA_ViT_base_e100.pth
+      DOFA_SOURCE_REVISION: 0cfb7e1099f4d4c4022946ff7862c7cd7b8411b9
+      DOFA_CHECKPOINT_REVISION: 7a5219e48d2f8848511b0fabea7920a8836bc480
+      DOFA_CHECKPOINT_SHA256: 4720985e42b918ac0307009eb06121a3435d9bbce6fd95446f84824a538165b1
+      SPECTRASHIFT_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install foundation, benchmark, and geospatial dependencies
+        run: |
+          python -m pip install \
+            --index-url https://download.pytorch.org/whl/cpu \
+            torch torchvision
+          python -m pip install -e '.[foundation,geo]'
+      - name: Materialize pinned DOFA source and checkpoint
+        run: |
+          git clone --filter=blob:none https://github.com/zhu-xlab/DOFA.git "$DOFA_SOURCE"
+          git -C "$DOFA_SOURCE" checkout --detach "$DOFA_SOURCE_REVISION"
+          python - <<'PY'
+          import os
+          from huggingface_hub import hf_hub_download
+
+          checkpoint = hf_hub_download(
+              repo_id="earthflow/DOFA",
+              filename="DOFA_ViT_base_e100.pth",
+              revision=os.environ["DOFA_CHECKPOINT_REVISION"],
+              local_dir="checkpoints",
+          )
+          print(checkpoint)
+          PY
+          echo "$DOFA_CHECKPOINT_SHA256  $DOFA_CHECKPOINT" | sha256sum --check
+      - name: Download deterministic leakage-safe MINI slice
+        run: |
+          spectrashift download-oxhyper-mini \
+            --output "$DATASET_ROOT" \
+            --train-groups 1 \
+            --validation-groups 2 \
+            --test-groups 1 \
+            --tiles-per-group 4
+      - name: Create hash-verified pilot manifest
+        run: |
+          spectrashift index-oxhyper \
+            --dataset-root "$DATASET_ROOT" \
+            --output "$PILOT_MANIFEST" \
+            --train-groups 1 \
+            --validation-groups 2 \
+            --test-groups 1 \
+            --tiles-per-group 4 \
+            --hash-files
+      - name: Run frozen DOFA wavelength-aware feature probe
+        run: |
+          spectrashift benchmark-oxhyper \
+            --manifest "$PILOT_MANIFEST" \
+            --dataset-root "$DATASET_ROOT" \
+            --model dofa-frozen \
+            --dofa-source "$DOFA_SOURCE" \
+            --dofa-checkpoint "$DOFA_CHECKPOINT" \
+            --dofa-source-revision "$DOFA_SOURCE_REVISION" \
+            --dofa-checkpoint-sha256 "$DOFA_CHECKPOINT_SHA256" \
+            --dofa-input-size 112 \
+            --dofa-feature-layer 11 \
+            --dofa-device cpu \
+            --max-train-pixels-per-tile 12000 \
+            --min-validation-positive-pixels 100 \
+            --output artifacts/oxhyper-mini-dofa-frozen
+      - name: Upload foundation-model evidence bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oxhyper-mini-dofa-frozen-${{ github.sha }}
+          path: |
+            data/pilots/oxhyper-mini.json
+            artifacts/oxhyper-mini-dofa-frozen
+          if-no-files-found: warn
+          retention-days: 14

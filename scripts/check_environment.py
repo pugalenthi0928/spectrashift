@@ -6,10 +6,10 @@ import os
 import platform
 import sys
 
-
 MODULES = (
     "numpy",
     "torch",
+    "timm",
     "sklearn",
     "yaml",
     "huggingface_hub",
@@ -25,6 +25,8 @@ def main() -> None:
         "platform": platform.platform(),
         "modules": {name: importlib.util.find_spec(name) is not None for name in MODULES},
         "environment_flags": {
+            "DOFA_CHECKPOINT": bool(os.getenv("DOFA_CHECKPOINT")),
+            "DOFA_SOURCE": bool(os.getenv("DOFA_SOURCE")),
             "HYPERSIGMA_CHECKPOINT": bool(os.getenv("HYPERSIGMA_CHECKPOINT")),
             "HYPERSIGMA_SOURCE": bool(os.getenv("HYPERSIGMA_SOURCE")),
             "HYPERFREE_CHECKPOINT": bool(os.getenv("HYPERFREE_CHECKPOINT")),
