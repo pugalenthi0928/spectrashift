@@ -20,7 +20,13 @@ from spectrashift.metrics import (
     multilabel_report,
     selective_risk_curve,
 )
+from spectrashift.models.dofa import (
+    DOFA_CHECKPOINT_SHA256,
+    DOFA_SOURCE_REVISION,
+    DofaConfig,
+)
 from spectrashift.models.sam import SpectralAngleMapper
+from spectrashift.retrieval import query_evidence
 from spectrashift.synthetic import make_synthetic_cube
 from spectrashift.targeting import extract_target_cards
 
@@ -125,11 +131,30 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark.add_argument("--dataset-root", type=Path, required=True)
     benchmark.add_argument("--output", type=Path, default=Path("artifacts/oxhyper-mini"))
     benchmark.add_argument(
-        "--model", choices=("prototype-sam", "pca-logistic"), default="pca-logistic"
+        "--model",
+        choices=("prototype-sam", "pca-logistic", "dofa-frozen"),
+        default="pca-logistic",
     )
     benchmark.add_argument("--max-train-pixels-per-tile", type=int, default=20000)
     benchmark.add_argument("--min-validation-positive-pixels", type=int, default=1)
     benchmark.add_argument("--seed", type=int, default=20260822)
+    benchmark.add_argument("--dofa-source", type=Path)
+    benchmark.add_argument("--dofa-checkpoint", type=Path)
+    benchmark.add_argument("--dofa-source-revision", default=DOFA_SOURCE_REVISION)
+    benchmark.add_argument("--dofa-checkpoint-sha256", default=DOFA_CHECKPOINT_SHA256)
+    benchmark.add_argument("--dofa-input-size", type=int, default=112)
+    benchmark.add_argument("--dofa-feature-layer", type=int, default=11)
+    benchmark.add_argument("--dofa-device", default="cpu")
+    benchmark.add_argument("--dofa-positive-patch-fraction", type=float, default=0.05)
+    benchmark.add_argument("--dofa-minimum-valid-patch-fraction", type=float, default=0.8)
+
+    query = subparsers.add_parser(
+        "query-evidence",
+        help="retrieve cited experiment evidence without changing model outputs",
+    )
+    query.add_argument("--root", type=Path, default=Path("results/oxhyper-mini"))
+    query.add_argument("--question", required=True)
+    query.add_argument("--top-k", type=int, default=5)
     return parser
 
 
@@ -178,6 +203,20 @@ def main() -> None:
             )
         )
     elif args.command == "benchmark-oxhyper":
+        dofa_config = None
+        if args.model == "dofa-frozen":
+            if args.dofa_source is None or args.dofa_checkpoint is None:
+                raise SystemExit("dofa-frozen requires --dofa-source and --dofa-checkpoint")
+            dofa_config = DofaConfig(
+                source_checkout=args.dofa_source,
+                checkpoint=args.dofa_checkpoint,
+                source_revision=args.dofa_source_revision,
+                checkpoint_sha256=args.dofa_checkpoint_sha256,
+                input_size=args.dofa_input_size,
+                feature_layer=args.dofa_feature_layer,
+                device=args.dofa_device,
+                seed=args.seed,
+            )
         summary = run_oxhyper_benchmark(
             args.manifest,
             args.dataset_root,
@@ -186,8 +225,19 @@ def main() -> None:
             max_train_pixels_per_tile=args.max_train_pixels_per_tile,
             min_validation_positive_pixels=args.min_validation_positive_pixels,
             seed=args.seed,
+            dofa_config=dofa_config,
+            dofa_positive_patch_fraction=args.dofa_positive_patch_fraction,
+            dofa_minimum_valid_patch_fraction=args.dofa_minimum_valid_patch_fraction,
         )
         print(json.dumps(summary, indent=2, sort_keys=True))
+    elif args.command == "query-evidence":
+        print(
+            json.dumps(
+                query_evidence(args.root, args.question, top_k=args.top_k),
+                indent=2,
+                sort_keys=True,
+            )
+        )
 
 
 if __name__ == "__main__":

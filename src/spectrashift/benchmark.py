@@ -4,11 +4,12 @@ import os
 import platform
 import sys
 import time
+from collections.abc import Callable, Iterable
 from dataclasses import asdict
 from datetime import UTC, datetime
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any
 
 import numpy as np
 
@@ -27,6 +28,12 @@ from spectrashift.metrics import (
     multilabel_report,
     optimize_f1_thresholds,
     selective_risk_curve,
+)
+from spectrashift.models.dofa import (
+    DofaConfig,
+    DofaFeatureEncoder,
+    DofaFrozenProbe,
+    FrozenProbeConfig,
 )
 from spectrashift.models.pca_logistic import PcaLogisticBaseline, PcaLogisticConfig
 from spectrashift.models.sam import SpectralAngleMapper
@@ -113,9 +120,7 @@ def _fit_model(
 
 def _records(manifest: dict[str, Any], split: str) -> list[OxHyperRecord]:
     return [
-        OxHyperRecord.from_dict(value)
-        for value in manifest["records"]
-        if value["split"] == split
+        OxHyperRecord.from_dict(value) for value in manifest["records"] if value["split"] == split
     ]
 
 
@@ -249,6 +254,9 @@ def run_oxhyper_benchmark(
     min_validation_positive_pixels: int = 1,
     seed: int = 20260822,
     loader: CubeLoader = load_oxhyper_cube,
+    dofa_config: DofaConfig | None = None,
+    dofa_positive_patch_fraction: float = 0.05,
+    dofa_minimum_valid_patch_fraction: float = 0.8,
 ) -> dict[str, Any]:
     """Run a locked train/validation/test pilot and preserve its evidence bundle."""
 
@@ -264,9 +272,12 @@ def run_oxhyper_benchmark(
 
     train_spectra: list[np.ndarray] = []
     train_labels: list[np.ndarray] = []
+    training_cubes: list[HyperspectralCube] = []
     train_start = time.perf_counter()
     for index, record in enumerate(_records(pilot, "train")):
         cube = loader(dataset_root, record)
+        if model_name == "dofa-frozen":
+            training_cubes.append(cube)
         spectra, labels = sample_labeled_pixels(
             cube,
             max_pixels=max_train_pixels_per_tile,
@@ -277,7 +288,21 @@ def run_oxhyper_benchmark(
     spectra = np.concatenate(train_spectra)
     labels = np.concatenate(train_labels)
     training_profile = _label_profile(labels)
-    model = _fit_model(model_name, spectra, labels, seed=seed)
+    if model_name == "dofa-frozen":
+        if dofa_config is None:
+            raise ValueError("dofa_config is required for the dofa-frozen benchmark")
+        encoder = DofaFeatureEncoder(dofa_config)
+        model = DofaFrozenProbe(
+            encoder,
+            FrozenProbeConfig(
+                positive_patch_fraction=dofa_positive_patch_fraction,
+                minimum_valid_patch_fraction=dofa_minimum_valid_patch_fraction,
+                seed=seed,
+            ),
+        ).fit(training_cubes)
+    else:
+        model = _fit_model(model_name, spectra, labels, seed=seed)
+    del training_cubes
     train_seconds = time.perf_counter() - train_start
 
     validation_outputs, validation_latency = _load_predictions(
@@ -315,22 +340,15 @@ def run_oxhyper_benchmark(
         },
         "validation": validation_profile,
         "test": test_profile,
-        "tiles": {
-            split: len(_records(pilot, split))
-            for split in ("train", "validation", "test")
-        },
+        "tiles": {split: len(_records(pilot, split)) for split in ("train", "validation", "test")},
     }
     report["threshold_selection"] = {
         "split": "validation",
         "objective": "per-class F1",
         "candidates": threshold_candidates.tolist(),
         "selected": thresholds.tolist(),
-        "at_lower_search_bound": np.isclose(
-            thresholds, threshold_candidates[0]
-        ).tolist(),
-        "at_upper_search_bound": np.isclose(
-            thresholds, threshold_candidates[-1]
-        ).tolist(),
+        "at_lower_search_bound": np.isclose(thresholds, threshold_candidates[0]).tolist(),
+        "at_upper_search_bound": np.isclose(thresholds, threshold_candidates[-1]).tolist(),
     }
     report["efficiency"] = {
         "training_seconds": train_seconds,
@@ -370,17 +388,18 @@ def run_oxhyper_benchmark(
         all_cards.extend(card.to_dict() for card in cards)
         all_failures.extend(_failure_cases(cube, probabilities, thresholds))
 
+    descriptor = asdict(model.descriptor)
+    model_config = model.configuration() if hasattr(model, "configuration") else {}
     stable_run = {
         "pilot_definition_sha256": sha256_value(
             {key: value for key, value in pilot.items() if key != "created_at_utc"}
         ),
         "model_name": model_name,
+        "model_configuration": model_config,
         "seed": seed,
         "max_train_pixels_per_tile": max_train_pixels_per_tile,
         "min_validation_positive_pixels": min_validation_positive_pixels,
     }
-    descriptor = asdict(model.descriptor)
-    model_config = model.configuration() if hasattr(model, "configuration") else {}
     run_manifest = RunManifest(
         run_id=f"oxhyper-{sha256_value(stable_run)[:12]}",
         created_at_utc=datetime.now(UTC).isoformat(),
@@ -405,6 +424,8 @@ def run_oxhyper_benchmark(
             "numpy": np.__version__,
             "rasterio": _installed_version("rasterio"),
             "scikit_learn": _installed_version("scikit-learn"),
+            "torch": _installed_version("torch"),
+            "timm": _installed_version("timm"),
             "platform": platform.platform(),
             "source_commit": os.environ.get("SPECTRASHIFT_SOURCE_COMMIT"),
         },
@@ -433,9 +454,7 @@ def run_oxhyper_benchmark(
         "failure_cases": len(all_failures),
         "threshold_boundary_classes": [
             class_name
-            for class_name, threshold in zip(
-                OXHYPER_CLASS_NAMES, thresholds, strict=True
-            )
+            for class_name, threshold in zip(OXHYPER_CLASS_NAMES, thresholds, strict=True)
             if np.isclose(threshold, threshold_candidates[0])
             or np.isclose(threshold, threshold_candidates[-1])
         ],

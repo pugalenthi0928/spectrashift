@@ -1,4 +1,4 @@
-.PHONY: install install-benchmark test demo check oxhyper-index oxhyper-benchmark
+.PHONY: install install-benchmark test demo check oxhyper-index oxhyper-benchmark evidence-query
 
 install:
 	python3 -m pip install -e .
@@ -26,3 +26,8 @@ oxhyper-benchmark:
 		--dataset-root data/external/OxHyperMinerals_MINI \
 		--model pca-logistic \
 		--output artifacts/oxhyper-mini-pca-logistic
+
+evidence-query:
+	PYTHONPATH=src python3 -m spectrashift query-evidence \
+		--root results/oxhyper-mini \
+		--question "Why is the current result not deployment ready?"
