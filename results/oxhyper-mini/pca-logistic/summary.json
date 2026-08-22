@@ -1,0 +1,23 @@
+{
+  "artifact_hashes": {
+    "failure_cases.json": "74fd71aaa10f4a99d58f216e9d8e00a030df5e997ff2c39b01e32ff2e0b89fe3",
+    "metrics.json": "c413c9a4c3c00a6c9bf5fec4b7f04d6cad265bee37bd229a16b53f6436b370be",
+    "run_manifest.json": "e5d9f216471f07a8f96d773ac0ab11876f30af89fd903ab0da6a5aeb1a71c94d",
+    "target_cards.json": "440bee469a1e98e4fb93f3660b870cf5a265b9aaf94de5681adada6bc4586b2a",
+    "thresholds.json": "618083e995e2ce0e5fe46ea5c6771d2c133d8daf4731a8812c785db9909780bc"
+  },
+  "evidence_grade": "public-benchmark-observed",
+  "failure_cases": 28,
+  "macro_average_precision": 0.24173292854515302,
+  "macro_f1": 0.05485377411830531,
+  "mean_iou": 0.028603889957225948,
+  "model": "pca-logistic",
+  "run_id": "oxhyper-3620e8b914cc",
+  "targets": 22,
+  "test_tiles": 1,
+  "threshold_boundary_classes": [
+    "hematite",
+    "kaolinite"
+  ],
+  "warning": "Experimental pseudo-label benchmark; not field or deposit validation."
+}

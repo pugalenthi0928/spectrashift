@@ -7,7 +7,16 @@ import platform
 import sys
 
 
-MODULES = ("numpy", "torch", "sklearn", "yaml", "rasterio", "xarray", "netCDF4")
+MODULES = (
+    "numpy",
+    "torch",
+    "sklearn",
+    "yaml",
+    "huggingface_hub",
+    "rasterio",
+    "xarray",
+    "netCDF4",
+)
 
 
 def main() -> None:
@@ -27,4 +36,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

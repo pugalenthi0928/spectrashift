@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "evidence_grade": "public-benchmark-observed",
+  "dataset": {
+    "repository": "previtus/OxHyperMinerals_MINI",
+    "revision": "0b58274",
+    "labels": "EMIT L2B-derived experimental pseudo-labels"
+  },
+  "provenance": {
+    "source_commit": "74feebb24f19b62213cea91d6bbd8d3cfb6da6ec",
+    "workflow_run": "https://github.com/pugalenthi0928/spectrashift/actions/runs/32518705156",
+    "artifact_id": 9459767836,
+    "artifact_sha256": "86d7e8647f7ddc98d8f741f108127f61cd2ee5b1755dcb40bea35c1f5ebf2127",
+    "pilot_manifest_canonical_json_sha256": "fdf851be0fe1af472286599c6a3bac9b39c25521135fc76ecb61e02185784343",
+    "pilot_manifest_file_sha256": "cb787a80e168a8fa7469f8ad64e5ec4879e6e02ccb081f080906dc33546feef1",
+    "pilot_definition_sha256": "21691337ef2290d197993a3dd907b7d6317c71cb7ddffe3a88c70b6aba7ff4f4"
+  },
+  "selection": {
+    "tiles": {"train": 4, "validation": 3, "test": 1},
+    "source_groups": {"train": 1, "validation": 2, "test": 1},
+    "excluded_cross_split_source_groups": 5,
+    "validation_positive_pixels": {
+      "goethite": 13848,
+      "hematite": 29931,
+      "kaolinite": 23420
+    },
+    "test_positive_pixels": {
+      "goethite": 29687,
+      "hematite": 99479,
+      "kaolinite": 13005
+    }
+  },
+  "models": {
+    "prototype-sam": {
+      "run_id": "oxhyper-934df10736a9",
+      "macro_f1": 0.19892969078883058,
+      "macro_average_precision": 0.2119322125930689,
+      "mean_iou": 0.11897619936430136,
+      "expected_calibration_error": 0.1639645251470778,
+      "brier_score": 0.18368518900779715,
+      "mean_test_tile_latency_ms": 79.242954999998,
+      "process_peak_rss_mb": 2321.7734375,
+      "thresholds": {"goethite": 0.15, "hematite": 0.05, "kaolinite": 0.1}
+    },
+    "pca-logistic": {
+      "run_id": "oxhyper-3620e8b914cc",
+      "macro_f1": 0.05485377411830531,
+      "macro_average_precision": 0.24173292854515302,
+      "mean_iou": 0.028603889957225948,
+      "expected_calibration_error": 0.4867232909268611,
+      "brier_score": 0.48673290301979605,
+      "mean_test_tile_latency_ms": 182.2783270000059,
+      "process_peak_rss_mb": 2435.51171875,
+      "thresholds": {"goethite": 0.8, "hematite": 0.05, "kaolinite": 0.95}
+    }
+  },
+  "decision": {
+    "thresholded_map_reference": "prototype-sam",
+    "ranking_failure_baseline": "pca-logistic",
+    "next_experiment": "Frozen HyperFree features on the identical pilot definition",
+    "deployment_ready": false
+  },
+  "limitations": [
+    "One held-out test tile is not population-level generalization.",
+    "Pseudo-label agreement is not field validation.",
+    "Surface mineral indicators do not establish a subsurface economic deposit."
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "created_at_utc": "2026-08-21T19:29:54.995487+00:00",
+  "dataset": {
+    "class_names": [
+      "goethite",
+      "hematite",
+      "kaolinite"
+    ],
+    "label_provenance": "EMIT L2B-derived experimental pseudo-labels",
+    "license": "CC-BY-4.0 according to the dataset card",
+    "name": "OxHyperMinerals",
+    "repository": "previtus/OxHyperMinerals_MINI",
+    "revision": "0b58274",
+    "sensor": "NASA EMIT",
+    "spectral_bands": 285
+  },
+  "evidence_grade_on_success": "public-benchmark-observed",
+  "limitations": [
+    "Labels are experimental EMIT L2B-derived pseudo-labels, not field truth.",
+    "A small pilot estimates pipeline behavior and does not represent the full dataset.",
+    "Surface mineral indicators do not establish a subsurface economic deposit."
+  ],
+  "records": [
+    {
+      "cube_path": "2300705x006_2302506x009_03/C",
+      "cube_sha256": "69c871a1f2a97dbe2c6f40d20f182d94a966f954a40f773fbd42b49f694a8fa7",
+      "cube_size_bytes": 298844160,
+      "header_path": "2300705x006_2302506x009_03/C.hdr",
+      "info_path": "2300705x006_2302506x009_03/info.json",
+      "label_path": "2300705x006_2302506x009_03/minerals3ghk.tif",
+      "label_sha256": "e4bde012e1118f330f92b0b0bcac9fc983990d0df1bc035f9dd7143f407a06c4",
+      "label_size_bytes": 1572864,
+      "source_group": "2300705x006_2302506x009",
+      "split": "test",
+      "tile_id": "2300705x006_2302506x009_03"
+    },
+    {
+      "cube_path": "2222705x010_2223002x001_00/C",
+      "cube_sha256": "1e61e93bffb3376fef9d2c47db1fa3e9139c37ffaa0c7658236f5335e37198d2",
+      "cube_size_bytes": 298844160,
+      "header_path": "2222705x010_2223002x001_00/C.hdr",
+      "info_path": "2222705x010_2223002x001_00/info.json",
+      "label_path": "2222705x010_2223002x001_00/minerals3ghk.tif",
+      "label_sha256": "dcba31a6cff68e88ff9fb381659104931c3aab25d5d3c2d54b3efd83c971a1cd",
+      "label_size_bytes": 1572864,
+      "source_group": "2222705x010_2223002x001",
+      "split": "train",
+      "tile_id": "2222705x010_2223002x001_00"
+    },
+    {
+      "cube_path": "2222705x010_2223002x001_01/C",
+      "cube_sha256": "af61960388c3a7d8ba4a0d16d7892e14f9afa3180942b670eaa5c4fa10228c8d",
+      "cube_size_bytes": 298844160,
+      "header_path": "2222705x010_2223002x001_01/C.hdr",
+      "info_path": "2222705x010_2223002x001_01/info.json",
+      "label_path": "2222705x010_2223002x001_01/minerals3ghk.tif",
+      "label_sha256": "f5d76f72dab52df35326ae9de67d9ec9215e0f09822fe0bbbcf17b37d3b560fd",
+      "label_size_bytes": 1572864,
+      "source_group": "2222705x010_2223002x001",
+      "split": "train",
+      "tile_id": "2222705x010_2223002x001_01"
+    },
+    {
+      "cube_path": "2222705x010_2223002x001_02/C",
+      "cube_sha256": "f72c79b2653cfcb58887bd87859d077a9c3e2a6b9943118d867859311f468691",
+      "cube_size_bytes": 298844160,
+      "header_path": "2222705x010_2223002x001_02/C.hdr",
+      "info_path": "2222705x010_2223002x001_02/info.json",
+      "label_path": "2222705x010_2223002x001_02/minerals3ghk.tif",
+      "label_sha256": "999497a0721d92d65d7a661db18c1ae671ab3e6fb97df9bdcb6757c3a88cee2a",
+      "label_size_bytes": 1572864,
+      "source_group": "2222705x010_2223002x001",
+      "split": "train",
+      "tile_id": "2222705x010_2223002x001_02"
+    },
+    {
+      "cube_path": "2222705x010_2223002x001_03/C",
+      "cube_sha256": "f5b8904fa61af3f46b02dcec85ed8992d9a1f81992ab9e70dba04f0fb94e3e0c",
+      "cube_size_bytes": 298844160,
+      "header_path": "2222705x010_2223002x001_03/C.hdr",
+      "info_path": "2222705x010_2223002x001_03/info.json",
+      "label_path": "2222705x010_2223002x001_03/minerals3ghk.tif",
+      "label_sha256": "d1e4590b472cfc9f7af76e333d6f9b1a3ef64553eef1cb6644af126928ca9e6b",
+      "label_size_bytes": 1572864,
+      "source_group": "2222705x010_2223002x001",
+      "split": "train",
+      "tile_id": "2222705x010_2223002x001_03"
+    },
+    {
+      "cube_path": "2302402x003_2305704x048_01/C",
+      "cube_sha256": "7c6b7d12dd8e2b3e6897aa5048376298501a4fac2791ab7d3cfb338fc7f2830b",
+      "cube_size_bytes": 298844160,
+      "header_path": "2302402x003_2305704x048_01/C.hdr",
+      "info_path": "2302402x003_2305704x048_01/info.json",
+      "label_path": "2302402x003_2305704x048_01/minerals3ghk.tif",
+      "label_sha256": "2184e060829acf0e177ff9fbbbd34ec1e0cd3488683da5cce8571d7b266640a5",
+      "label_size_bytes": 1572864,
+      "source_group": "2302402x003_2305704x048",
+      "split": "validation",
+      "tile_id": "2302402x003_2305704x048_01"
+    },
+    {
+      "cube_path": "2302402x003_2305704x048_02/C",
+      "cube_sha256": "1317d7e69566080e53c339ea41ed751c1a4a207597e8ada9ed38833a353b8564",
+      "cube_size_bytes": 298844160,
+      "header_path": "2302402x003_2305704x048_02/C.hdr",
+      "info_path": "2302402x003_2305704x048_02/info.json",
+      "label_path": "2302402x003_2305704x048_02/minerals3ghk.tif",
+      "label_sha256": "c2b82f7ac6bc01f21f7854d930ca9e6dec441fff59f006d3fb3e34a2d691728b",
+      "label_size_bytes": 1572864,
+      "source_group": "2302402x003_2305704x048",
+      "split": "validation",
+      "tile_id": "2302402x003_2305704x048_02"
+    },
+    {
+      "cube_path": "2302707x001_2304808x051_02/C",
+      "cube_sha256": "ae2eb36351040442e71ce7d3ac0cfb2ddf14746c09ceb3017f6add77987f264f",
+      "cube_size_bytes": 298844160,
+      "header_path": "2302707x001_2304808x051_02/C.hdr",
+      "info_path": "2302707x001_2304808x051_02/info.json",
+      "label_path": "2302707x001_2304808x051_02/minerals3ghk.tif",
+      "label_sha256": "7c064abae258bd616701f5fa179d17324d953d1eda5be0cea6a49dcd252a82e3",
+      "label_size_bytes": 1572864,
+      "source_group": "2302707x001_2304808x051",
+      "split": "validation",
+      "tile_id": "2302707x001_2304808x051_02"
+    }
+  ],
+  "schema_version": 1,
+  "selection": {
+    "excluded_leaking_groups": {
+      "2222204x006_2224105x025": [
+        "test",
+        "train"
+      ],
+      "2222702x018_2223503x014": [
+        "test",
+        "train"
+      ],
+      "2301108x007_2301312x006": [
+        "test",
+        "validation"
+      ],
+      "2301608x003_2302309x035": [
+        "test",
+        "validation"
+      ],
+      "2302210x008_2304809x031": [
+        "test",
+        "validation"
+      ]
+    },
+    "groups_per_split": {
+      "test": 1,
+      "train": 1,
+      "validation": 2
+    },
+    "published_tiles_per_split": {
+      "test": 10,
+      "train": 10,
+      "validation": 10
+    },
+    "seed": 20260822,
+    "selected_groups_per_split": {
+      "test": 1,
+      "train": 1,
+      "validation": 2
+    },
+    "selected_tiles_per_split": {
+      "test": 1,
+      "train": 4,
+      "validation": 3
+    },
+    "tiles_per_group": 4
+  }
+}

@@ -3,7 +3,9 @@ from __future__ import annotations
 import numpy as np
 
 
-def _validate_binary_inputs(labels: np.ndarray, probabilities: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def _validate_binary_inputs(
+    labels: np.ndarray, probabilities: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
     labels = np.asarray(labels, dtype=np.uint8)
     probabilities = np.asarray(probabilities, dtype=np.float64)
     if labels.shape != probabilities.shape:
@@ -34,11 +36,21 @@ def multilabel_report(
     labels: np.ndarray,
     probabilities: np.ndarray,
     *,
-    threshold: float = 0.5,
+    threshold: float | np.ndarray = 0.5,
 ) -> dict[str, object]:
     labels, probabilities = _validate_binary_inputs(labels, probabilities)
-    predictions = probabilities >= threshold
     class_count = labels.shape[-1]
+    thresholds = np.asarray(threshold, dtype=np.float64)
+    if thresholds.ndim == 0:
+        thresholds = np.repeat(thresholds, class_count)
+        reported_threshold: float | list[float] = float(thresholds[0])
+    elif thresholds.shape == (class_count,):
+        reported_threshold = thresholds.tolist()
+    else:
+        raise ValueError("threshold must be scalar or contain one value per class")
+    if np.any((thresholds < 0) | (thresholds > 1)):
+        raise ValueError("thresholds must lie in [0, 1]")
+    predictions = probabilities >= thresholds
     per_class: list[dict[str, float | int]] = []
     for class_index in range(class_count):
         truth = labels[..., class_index].astype(bool)
@@ -62,7 +74,7 @@ def multilabel_report(
             }
         )
     return {
-        "threshold": threshold,
+        "threshold": reported_threshold,
         "macro_f1": float(np.mean([row["f1"] for row in per_class])),
         "mean_iou": float(np.mean([row["iou"] for row in per_class])),
         "macro_average_precision": float(
@@ -70,6 +82,45 @@ def multilabel_report(
         ),
         "per_class": per_class,
     }
+
+
+def optimize_f1_thresholds(
+    labels: np.ndarray,
+    probabilities: np.ndarray,
+    *,
+    candidates: np.ndarray | None = None,
+) -> np.ndarray:
+    """Select one threshold per class using validation data only."""
+
+    labels, probabilities = _validate_binary_inputs(labels, probabilities)
+    if candidates is None:
+        candidates = np.linspace(0.05, 0.95, 19)
+    candidates = np.asarray(candidates, dtype=np.float64)
+    if candidates.ndim != 1 or candidates.size == 0:
+        raise ValueError("candidates must be a non-empty one-dimensional array")
+    if np.any((candidates < 0) | (candidates > 1)):
+        raise ValueError("candidate thresholds must lie in [0, 1]")
+
+    thresholds = np.empty(labels.shape[-1], dtype=np.float64)
+    for class_index in range(labels.shape[-1]):
+        truth = labels[..., class_index].astype(bool)
+        scores = probabilities[..., class_index]
+        best_threshold = float(candidates[0])
+        best_key = (-1.0, -1.0, -best_threshold)
+        for candidate in candidates:
+            predicted = scores >= candidate
+            tp = int(np.sum(truth & predicted))
+            fp = int(np.sum(~truth & predicted))
+            fn = int(np.sum(truth & ~predicted))
+            precision = tp / (tp + fp) if tp + fp else 0.0
+            recall = tp / (tp + fn) if tp + fn else 0.0
+            f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+            key = (f1, precision, -float(candidate))
+            if key > best_key:
+                best_key = key
+                best_threshold = float(candidate)
+        thresholds[class_index] = best_threshold
+    return thresholds
 
 
 def expected_calibration_error(
@@ -91,7 +142,8 @@ def expected_calibration_error(
         else:
             mask = (confidence >= edges[index]) & (confidence < edges[index + 1])
         if np.any(mask):
-            error += float(np.mean(mask)) * abs(float(np.mean(confidence[mask])) - float(np.mean(truth[mask])))
+            gap = abs(float(np.mean(confidence[mask])) - float(np.mean(truth[mask])))
+            error += float(np.mean(mask)) * gap
     return float(error)
 
 
@@ -124,4 +176,3 @@ def selective_risk_curve(
         }
         for count in counts
     ]
-

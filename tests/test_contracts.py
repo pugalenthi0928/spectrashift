@@ -25,7 +25,15 @@ class HyperspectralCubeTests(unittest.TestCase):
                 valid_mask=np.ones((2, 2), dtype=bool),
             )
 
+    def test_preserves_float32_for_real_cube_memory_efficiency(self) -> None:
+        cube = HyperspectralCube(
+            scene_id="scene-float32",
+            reflectance=np.ones((2, 2, 3), dtype=np.float32),
+            wavelengths_nm=np.array([400, 500, 600]),
+            valid_mask=np.ones((2, 2), dtype=bool),
+        )
+        self.assertEqual(cube.reflectance.dtype, np.float32)
+
 
 if __name__ == "__main__":
     unittest.main()
-

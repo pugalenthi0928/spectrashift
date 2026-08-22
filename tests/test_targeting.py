@@ -20,7 +20,21 @@ class TargetingTests(unittest.TestCase):
         self.assertEqual(cards[0].rank, 1)
         self.assertGreater(cards[0].score, cards[1].score)
 
+    def test_uses_scene_identity_and_per_class_thresholds(self) -> None:
+        probabilities = np.zeros((8, 8, 2), dtype=float)
+        probabilities[1:4, 1:4, 0] = 0.7
+        probabilities[4:7, 4:7, 1] = 0.8
+        cards = extract_target_cards(
+            probabilities,
+            ("a", "b"),
+            valid_mask=np.ones((8, 8), dtype=bool),
+            threshold=np.array([0.6, 0.75]),
+            min_pixels=4,
+            scene_id="real-tile-01",
+        )
+        self.assertEqual({card.scene_id for card in cards}, {"real-tile-01"})
+        self.assertTrue(all(card.target_id.startswith("real-tile-01:") for card in cards))
+
 
 if __name__ == "__main__":
     unittest.main()
-

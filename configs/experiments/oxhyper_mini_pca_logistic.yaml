@@ -1,0 +1,38 @@
+experiment:
+  name: oxhyper_mini_pca_logistic
+  status: public_pilot_observed
+  seed: 20260822
+
+data:
+  repository: previtus/OxHyperMinerals_MINI
+  revision: 0b58274
+  split_files:
+    train: train_minerals_10.csv
+    validation: val_minerals_10.csv
+    test: test_minerals_10.csv
+  source_group_policy: remove_final_tile_suffix
+  groups_per_split:
+    train: 1
+    validation: 2
+    test: 1
+  tiles_per_group: 4
+  label_classes: [goethite, hematite, kaolinite]
+  label_provenance: emit_l2b_derived_experimental_pseudo_labels
+
+model:
+  family: PCA+LogisticRegression
+  pca_components: 32
+  class_weight: balanced
+  max_train_pixels_per_tile: 12000
+
+evaluation:
+  threshold_source: validation_only
+  min_validation_positive_pixels: 100
+  metrics: [macro_f1, average_precision, mean_iou, ece, brier, risk_coverage]
+  preserve_prediction_maps: true
+  preserve_failure_spectra: true
+
+claims:
+  allow_public_result: true
+  result_path: results/oxhyper-mini
+  achieved_grade: public-benchmark-observed

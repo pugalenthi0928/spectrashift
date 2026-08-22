@@ -1,0 +1,22 @@
+{
+  "artifact_hashes": {
+    "failure_cases.json": "0f848189aa92c1640a886a6cfff46cdd046f8b98779a58765494c0af2b8de49b",
+    "metrics.json": "08fd12f5c03e661d284a87be37f6a41dce50692b8b53bb10ecf678a5ce698b7d",
+    "run_manifest.json": "842bb87d2d9b1f7cd16f4d4d21e477b7bb6138af3489627faca64d5b9880eb0e",
+    "target_cards.json": "9b05676f82eec8a5cd77fe180a5514f1e1ca0d5b54e5d9803ffa90206f4702d2",
+    "thresholds.json": "2fb449e566654be4c53e30627e296daa790d47ec9aeeb7575e71dd4169febf9a"
+  },
+  "evidence_grade": "public-benchmark-observed",
+  "failure_cases": 30,
+  "macro_average_precision": 0.2119322125930689,
+  "macro_f1": 0.19892969078883058,
+  "mean_iou": 0.11897619936430136,
+  "model": "prototype-sam",
+  "run_id": "oxhyper-934df10736a9",
+  "targets": 25,
+  "test_tiles": 1,
+  "threshold_boundary_classes": [
+    "hematite"
+  ],
+  "warning": "Experimental pseudo-label benchmark; not field or deposit validation."
+}
