@@ -18,7 +18,7 @@ The intended path is:
 | Real 285-band ingestion | Pinned, hash-verified OxHyperMinerals-MINI tiles |
 | Leakage control | Published splits plus disjoint source-capture validation |
 | Model comparison | Prototype SAM and PCA-logistic held-out baselines |
-| Foundation adaptation | Pinned DOFA ViT-B frozen-token probe; benchmark configured, not yet reported |
+| Foundation adaptation | Pinned DOFA ViT-B frozen-token probe; observed public benchmark with failure analysis |
 | Decision quality | F1, AUPRC, IoU, ECE, Brier, risk-coverage, latency, and memory |
 | Failure analysis | Preserved false-positive/false-negative spectra and threshold-edge flags |
 | Analyst evidence | Cited vector retrieval over manifests, metrics, targets, and limitations |
@@ -39,10 +39,11 @@ This repository is being built in evidence-first stages.
   target extraction, target ranking, a deterministic synthetic demonstration, and a real-data
   OxHyperMinerals pilot runner with ENVI ingestion, source-group leakage detection, validation-only
   threshold selection, PCA-logistic and prototype-SAM baselines, prediction maps, and failure cases.
-- **Foundation adapter implemented:** the pinned DOFA ViT-B checkpoint accepts the full 285-band
+- **Foundation adapter observed:** the pinned DOFA ViT-B checkpoint accepts the full 285-band
   EMIT wavelength grid, interpolates its position embedding to a resource-bounded token grid,
-  freezes 111.2M backbone parameters, and fits three linear mineral heads. The public-data run is
-  configured but no score is claimed yet.
+  freezes 111.2M backbone parameters, and fits three linear mineral heads (2,307 trainable
+  parameters). The held-out result is preserved with its strong hematite ranking and failed
+  calibration; it is not presented as deployment-ready.
 - **Evidence retrieval implemented:** analyst questions retrieve cited Markdown sections and JSON
   pointers from immutable experiment bundles. Retrieval can explain a result but cannot change a
   prediction, threshold, rank, or evidence grade.
@@ -109,8 +110,10 @@ spectrashift benchmark-oxhyper \
 See [the real-data pilot protocol](docs/REAL_DATA_PILOT.md) and
 [foundation-model adaptation protocol](docs/FOUNDATION_MODEL_ADAPTATION.md), plus the
 [reviewed public-pilot result](results/oxhyper-mini/README.md). On one held-out MINI test tile,
-prototype-SAM reached 0.199 macro F1 and 0.212 macro AUPRC; PCA-logistic reached 0.055 and 0.242.
-These are pseudo-label pilot results, not field or deposit validation.
+prototype-SAM reached 0.199 macro F1 and 0.212 macro AUPRC; PCA-logistic reached 0.055 and 0.242;
+the frozen DOFA probe reached 0.273 and 0.225. DOFA's hematite AUPRC rose to 0.533, but its ECE was
+0.776 and two validation-selected maps became all-positive. These are pseudo-label pilot results,
+not field or deposit validation.
 
 ### Analyst evidence query
 

@@ -1,0 +1,23 @@
+{
+  "artifact_hashes": {
+    "failure_cases.json": "d700f1beac5aeb6dfa1dcc9d4e92442106ac17952564b318af2e636c25fb10fd",
+    "metrics.json": "945714073102d57018227ea752b9d83fd0c39a1bd02981bdde90ca0d3352160c",
+    "run_manifest.json": "15828beeadf6430ed750e0122545a3ee733c95b7dd979c8916f1a41f0785cffc",
+    "target_cards.json": "a428be29b9114baf047b1d91654c2494110b760806822cb83b5156f44be103c3",
+    "thresholds.json": "31edf6c979596e0d57a5db856c3f047482c066add2ab111378b8fa8a975cc2fe"
+  },
+  "evidence_grade": "public-benchmark-observed",
+  "failure_cases": 20,
+  "macro_average_precision": 0.22532573240808718,
+  "macro_f1": 0.2726318133964383,
+  "mean_iou": 0.1816723562590591,
+  "model": "dofa-frozen",
+  "run_id": "oxhyper-ecef3e542a07",
+  "targets": 3,
+  "test_tiles": 1,
+  "threshold_boundary_classes": [
+    "goethite",
+    "kaolinite"
+  ],
+  "warning": "Experimental pseudo-label benchmark; not field or deposit validation."
+}

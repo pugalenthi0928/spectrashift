@@ -1,6 +1,6 @@
 experiment:
   name: oxhyper_mini_dofa_frozen
-  status: configured_not_executed
+  status: public_pilot_observed
   seed: 20260822
 
 data:
@@ -34,6 +34,8 @@ evaluation:
   compare_against: [prototype-sam, pca-logistic]
 
 claims:
-  allow_public_result: false
+  allow_public_result: true
   required_grade: public-benchmark-observed
+  result: results/oxhyper-mini/dofa-frozen/summary.json
+  workflow_run: https://github.com/pugalenthi0928/spectrashift/actions/runs/32570622426
   warning: frozen token maps are coarser than pixel-level spectral baselines

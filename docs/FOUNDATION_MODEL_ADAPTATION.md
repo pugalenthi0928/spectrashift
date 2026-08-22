@@ -43,14 +43,23 @@ baselines.
 
 ## Required evidence
 
-The run must preserve the pinned data manifest, source and checkpoint identities, normalization
-policy, trainable and frozen parameter counts, validation thresholds, held-out metrics, latency,
-memory, prediction maps, target cards, and false-positive/false-negative spectra. Until that bundle
-exists, the configuration remains `configured_not_executed`.
+The run preserves the pinned data manifest, source and checkpoint identities, normalization policy,
+trainable and frozen parameter counts, validation thresholds, held-out metrics, latency, memory,
+prediction maps, target cards, and false-positive/false-negative spectra. The compact evidence is in
+`results/oxhyper-mini/dofa-frozen`; the complete artifact is attached to GitHub Actions run
+`32570622426`. The configuration is therefore `public_pilot_observed`.
+
+## Observed result
+
+The frozen probe reached 0.273 macro F1, 0.225 macro AUPRC, and 0.182 mean IoU on the one held-out
+tile. Its clearest signal was hematite ranking: 0.533 AUPRC versus 0.266 for prototype SAM. This is
+not a clean model win. Goethite and hematite collapsed to all-positive thresholded maps, while ECE
+rose to 0.776 and Brier score to 0.758. The result supports further representation ablations and
+calibration work, not deployment.
 
 ## Next ablations
 
-- pretrained checkpoint versus random initialization;
+- pretrained checkpoint versus random initialization (next experiment);
 - frozen final-layer tokens versus earlier layers;
 - 112 versus 224 pixel inputs;
 - frozen probe versus LoRA and full fine-tuning where GPU compute permits;

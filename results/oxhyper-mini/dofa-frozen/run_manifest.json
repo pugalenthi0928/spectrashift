@@ -1,0 +1,192 @@
+{
+  "created_at_utc": "2026-08-22T11:35:30.452945+00:00",
+  "data": {
+    "dataset": {
+      "class_names": [
+        "goethite",
+        "hematite",
+        "kaolinite"
+      ],
+      "label_provenance": "EMIT L2B-derived experimental pseudo-labels",
+      "license": "CC-BY-4.0 according to the dataset card",
+      "name": "OxHyperMinerals",
+      "repository": "previtus/OxHyperMinerals_MINI",
+      "revision": "0b58274",
+      "sensor": "NASA EMIT",
+      "spectral_bands": 285
+    },
+    "pilot_definition_sha256": "21691337ef2290d197993a3dd907b7d6317c71cb7ddffe3a88c70b6aba7ff4f4",
+    "pilot_manifest": "data/pilots/oxhyper-mini.json",
+    "pilot_manifest_sha256": "348e9df376f2fbf426c064b1312be5ce9e935bfe5f718c6847f67473c854c9b4",
+    "records": [
+      {
+        "cube_path": "2300705x006_2302506x009_03/C",
+        "cube_sha256": "69c871a1f2a97dbe2c6f40d20f182d94a966f954a40f773fbd42b49f694a8fa7",
+        "cube_size_bytes": 298844160,
+        "header_path": "2300705x006_2302506x009_03/C.hdr",
+        "info_path": "2300705x006_2302506x009_03/info.json",
+        "label_path": "2300705x006_2302506x009_03/minerals3ghk.tif",
+        "label_sha256": "e4bde012e1118f330f92b0b0bcac9fc983990d0df1bc035f9dd7143f407a06c4",
+        "label_size_bytes": 1572864,
+        "source_group": "2300705x006_2302506x009",
+        "split": "test",
+        "tile_id": "2300705x006_2302506x009_03"
+      },
+      {
+        "cube_path": "2222705x010_2223002x001_00/C",
+        "cube_sha256": "1e61e93bffb3376fef9d2c47db1fa3e9139c37ffaa0c7658236f5335e37198d2",
+        "cube_size_bytes": 298844160,
+        "header_path": "2222705x010_2223002x001_00/C.hdr",
+        "info_path": "2222705x010_2223002x001_00/info.json",
+        "label_path": "2222705x010_2223002x001_00/minerals3ghk.tif",
+        "label_sha256": "dcba31a6cff68e88ff9fb381659104931c3aab25d5d3c2d54b3efd83c971a1cd",
+        "label_size_bytes": 1572864,
+        "source_group": "2222705x010_2223002x001",
+        "split": "train",
+        "tile_id": "2222705x010_2223002x001_00"
+      },
+      {
+        "cube_path": "2222705x010_2223002x001_01/C",
+        "cube_sha256": "af61960388c3a7d8ba4a0d16d7892e14f9afa3180942b670eaa5c4fa10228c8d",
+        "cube_size_bytes": 298844160,
+        "header_path": "2222705x010_2223002x001_01/C.hdr",
+        "info_path": "2222705x010_2223002x001_01/info.json",
+        "label_path": "2222705x010_2223002x001_01/minerals3ghk.tif",
+        "label_sha256": "f5d76f72dab52df35326ae9de67d9ec9215e0f09822fe0bbbcf17b37d3b560fd",
+        "label_size_bytes": 1572864,
+        "source_group": "2222705x010_2223002x001",
+        "split": "train",
+        "tile_id": "2222705x010_2223002x001_01"
+      },
+      {
+        "cube_path": "2222705x010_2223002x001_02/C",
+        "cube_sha256": "f72c79b2653cfcb58887bd87859d077a9c3e2a6b9943118d867859311f468691",
+        "cube_size_bytes": 298844160,
+        "header_path": "2222705x010_2223002x001_02/C.hdr",
+        "info_path": "2222705x010_2223002x001_02/info.json",
+        "label_path": "2222705x010_2223002x001_02/minerals3ghk.tif",
+        "label_sha256": "999497a0721d92d65d7a661db18c1ae671ab3e6fb97df9bdcb6757c3a88cee2a",
+        "label_size_bytes": 1572864,
+        "source_group": "2222705x010_2223002x001",
+        "split": "train",
+        "tile_id": "2222705x010_2223002x001_02"
+      },
+      {
+        "cube_path": "2222705x010_2223002x001_03/C",
+        "cube_sha256": "f5b8904fa61af3f46b02dcec85ed8992d9a1f81992ab9e70dba04f0fb94e3e0c",
+        "cube_size_bytes": 298844160,
+        "header_path": "2222705x010_2223002x001_03/C.hdr",
+        "info_path": "2222705x010_2223002x001_03/info.json",
+        "label_path": "2222705x010_2223002x001_03/minerals3ghk.tif",
+        "label_sha256": "d1e4590b472cfc9f7af76e333d6f9b1a3ef64553eef1cb6644af126928ca9e6b",
+        "label_size_bytes": 1572864,
+        "source_group": "2222705x010_2223002x001",
+        "split": "train",
+        "tile_id": "2222705x010_2223002x001_03"
+      },
+      {
+        "cube_path": "2302402x003_2305704x048_01/C",
+        "cube_sha256": "7c6b7d12dd8e2b3e6897aa5048376298501a4fac2791ab7d3cfb338fc7f2830b",
+        "cube_size_bytes": 298844160,
+        "header_path": "2302402x003_2305704x048_01/C.hdr",
+        "info_path": "2302402x003_2305704x048_01/info.json",
+        "label_path": "2302402x003_2305704x048_01/minerals3ghk.tif",
+        "label_sha256": "2184e060829acf0e177ff9fbbbd34ec1e0cd3488683da5cce8571d7b266640a5",
+        "label_size_bytes": 1572864,
+        "source_group": "2302402x003_2305704x048",
+        "split": "validation",
+        "tile_id": "2302402x003_2305704x048_01"
+      },
+      {
+        "cube_path": "2302402x003_2305704x048_02/C",
+        "cube_sha256": "1317d7e69566080e53c339ea41ed751c1a4a207597e8ada9ed38833a353b8564",
+        "cube_size_bytes": 298844160,
+        "header_path": "2302402x003_2305704x048_02/C.hdr",
+        "info_path": "2302402x003_2305704x048_02/info.json",
+        "label_path": "2302402x003_2305704x048_02/minerals3ghk.tif",
+        "label_sha256": "c2b82f7ac6bc01f21f7854d930ca9e6dec441fff59f006d3fb3e34a2d691728b",
+        "label_size_bytes": 1572864,
+        "source_group": "2302402x003_2305704x048",
+        "split": "validation",
+        "tile_id": "2302402x003_2305704x048_02"
+      },
+      {
+        "cube_path": "2302707x001_2304808x051_02/C",
+        "cube_sha256": "ae2eb36351040442e71ce7d3ac0cfb2ddf14746c09ceb3017f6add77987f264f",
+        "cube_size_bytes": 298844160,
+        "header_path": "2302707x001_2304808x051_02/C.hdr",
+        "info_path": "2302707x001_2304808x051_02/info.json",
+        "label_path": "2302707x001_2304808x051_02/minerals3ghk.tif",
+        "label_sha256": "7c064abae258bd616701f5fa179d17324d953d1eda5be0cea6a49dcd252a82e3",
+        "label_size_bytes": 1572864,
+        "source_group": "2302707x001_2304808x051",
+        "split": "validation",
+        "tile_id": "2302707x001_2304808x051_02"
+      }
+    ]
+  },
+  "environment": {
+    "numpy": "2.4.6",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.11.16",
+    "rasterio": "1.4.4",
+    "scikit_learn": "1.9.0",
+    "source_commit": "dbbf13024e693aa9faa24146ac18b36517c1e5f4",
+    "timm": "1.0.28",
+    "torch": "2.13.0+cpu"
+  },
+  "evaluation": {
+    "max_train_pixels_per_tile": 12000,
+    "min_validation_positive_pixels": 100,
+    "seed": 20260822,
+    "threshold_source": "validation_only",
+    "thresholds": [
+      0.05,
+      0.2,
+      0.95
+    ]
+  },
+  "evidence_grade": "public-benchmark-observed",
+  "limitations": [
+    "Labels are experimental EMIT L2B-derived pseudo-labels, not field truth.",
+    "A small pilot estimates pipeline behavior and does not represent the full dataset.",
+    "Surface mineral indicators do not establish a subsurface economic deposit."
+  ],
+  "model": {
+    "adaptation": "frozen-wavelength-aware-features+linear-probe",
+    "checkpoint": "earthflow/DOFA@7a5219e48d2f8848511b0fabea7920a8836bc480/DOFA_ViT_base_e100.pth#4720985e42b918ac0307009eb06121a3435d9bbce6fd95446f84824a538165b1",
+    "configuration": {
+      "feature_dimension": 768,
+      "feature_encoder": {
+        "backbone_parameters": 111199232,
+        "checkpoint_actual_sha256": "4720985e42b918ac0307009eb06121a3435d9bbce6fd95446f84824a538165b1",
+        "checkpoint_repository": "earthflow/DOFA",
+        "checkpoint_revision": "7a5219e48d2f8848511b0fabea7920a8836bc480",
+        "checkpoint_sha256": "4720985e42b918ac0307009eb06121a3435d9bbce6fd95446f84824a538165b1",
+        "device": "cpu",
+        "feature_layer": 11,
+        "input_size": 112,
+        "max_normalization_pixels_per_cube": 20000,
+        "normalization": "per-band mean/std fitted on sampled training pixels only",
+        "repository": "https://github.com/zhu-xlab/DOFA",
+        "seed": 20260822,
+        "source_revision": "0cfb7e1099f4d4c4022946ff7862c7cd7b8411b9",
+        "wavelength_units_supplied_to_model": "micrometres"
+      },
+      "prediction_map_policy": "bilinear upsample from frozen token-grid probabilities",
+      "probe": {
+        "max_iter": 500,
+        "minimum_valid_patch_fraction": 0.8,
+        "positive_patch_fraction": 0.05,
+        "regularization_c": 1.0,
+        "seed": 20260822
+      },
+      "trainable_parameters": 2307,
+      "training_patches": 191
+    },
+    "evidence_grade": "mechanism-tested",
+    "family": "DOFA-ViT-B",
+    "revision": "0cfb7e1099f4d4c4022946ff7862c7cd7b8411b9"
+  },
+  "run_id": "oxhyper-ecef3e542a07"
+}

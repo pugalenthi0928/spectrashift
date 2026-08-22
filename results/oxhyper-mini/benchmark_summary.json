@@ -15,6 +15,15 @@
     "pilot_manifest_file_sha256": "cb787a80e168a8fa7469f8ad64e5ec4879e6e02ccb081f080906dc33546feef1",
     "pilot_definition_sha256": "21691337ef2290d197993a3dd907b7d6317c71cb7ddffe3a88c70b6aba7ff4f4"
   },
+  "foundation_provenance": {
+    "source_commit": "dbbf13024e693aa9faa24146ac18b36517c1e5f4",
+    "workflow_run": "https://github.com/pugalenthi0928/spectrashift/actions/runs/32570622426",
+    "artifact_id": 9475232408,
+    "artifact_sha256": "4c46768cf57b4f0558496fe3c919a045d9c1a5c5ecb93aaa5b7c27e9b176ffe9",
+    "dofa_source_revision": "0cfb7e1099f4d4c4022946ff7862c7cd7b8411b9",
+    "checkpoint_revision": "7a5219e48d2f8848511b0fabea7920a8836bc480",
+    "checkpoint_sha256": "4720985e42b918ac0307009eb06121a3435d9bbce6fd95446f84824a538165b1"
+  },
   "selection": {
     "tiles": {"train": 4, "validation": 3, "test": 1},
     "source_groups": {"train": 1, "validation": 2, "test": 1},
@@ -52,12 +61,34 @@
       "mean_test_tile_latency_ms": 182.2783270000059,
       "process_peak_rss_mb": 2435.51171875,
       "thresholds": {"goethite": 0.8, "hematite": 0.05, "kaolinite": 0.95}
+    },
+    "dofa-frozen": {
+      "run_id": "oxhyper-ecef3e542a07",
+      "macro_f1": 0.2726318133964383,
+      "macro_average_precision": 0.22532573240808718,
+      "mean_iou": 0.1816723562590591,
+      "expected_calibration_error": 0.775863595661354,
+      "brier_score": 0.7577976419176181,
+      "mean_test_tile_latency_ms": 603.3152749999999,
+      "process_peak_rss_mb": 3369.15234375,
+      "training_seconds": 11.590205519000008,
+      "frozen_parameters": 111199232,
+      "trainable_parameters": 2307,
+      "training_patches": 191,
+      "thresholds": {"goethite": 0.05, "hematite": 0.2, "kaolinite": 0.95},
+      "per_class": {
+        "goethite": {"f1": 0.22097337853982055, "average_precision": 0.1060662324046457},
+        "hematite": {"f1": 0.5877897100314637, "average_precision": 0.5334886465395108},
+        "kaolinite": {"f1": 0.00913235161803077, "average_precision": 0.036422318280104976}
+      }
     }
   },
   "decision": {
     "thresholded_map_reference": "prototype-sam",
     "ranking_failure_baseline": "pca-logistic",
-    "next_experiment": "Frozen HyperFree features on the identical pilot definition",
+    "best_hematite_ranking": "dofa-frozen",
+    "foundation_model_interpretation": "Useful hematite representation; unusable calibration and threshold transfer on the held-out geography",
+    "next_experiment": "Random-initialized DOFA ablation, then higher resolution and calibration on the identical pilot definition",
     "deployment_ready": false
   },
   "limitations": [
