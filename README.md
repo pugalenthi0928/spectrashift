@@ -1,4 +1,7 @@
 # SpectraShift
+SpectraShift uses hyperspectral satellite images, where each pixel contains 285 spectral bands instead of just red, green and blue. Because different minerals reflect light differently across these wavelengths, they have distinct spectral fingerprints.
+
+The project tests whether AI can use those fingerprints to identify and rank areas that may contain minerals worth investigating.
 
 **Sensor-adaptive foundation-model evaluation for evidence-backed hyperspectral mineral screening.**
 
